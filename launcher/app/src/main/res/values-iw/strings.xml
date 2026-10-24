@@ -141,4 +141,14 @@
     <string name="race_countdown_hours">%1$d שע׳ %2$d דק׳</string>
     <string name="race_countdown_days">%1$d ימ׳ %2$d שע׳</string>
     <string name="last_opened">פתיחה אחרונה: %1$s</string>
+    <string name="prayer_fajr">פג׳ר</string>
+    <string name="prayer_dhuhr">ד׳והר</string>
+    <string name="prayer_asr">עסר</string>
+    <string name="prayer_maghrib">מע׳רב</string>
+    <string name="prayer_isha">עישא</string>
+    <string name="prayer_line">%1$s %2$s · בעוד %3$s</string>
+    <string name="prayer_in_minutes">%1$d דק׳</string>
+    <string name="prayer_in_hours">%1$d שע׳ %2$d דק׳</string>
+    <string name="prayer_in_hours_whole">%1$d שע׳</string>
+    <string name="prayer_notice">זמן תפילה: %1$s %2$s</string>
 </resources>

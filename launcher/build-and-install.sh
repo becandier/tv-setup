@@ -187,6 +187,8 @@ esac
 #                         sticks: the key is routed to the launcher (HomeKeyService)
 #   RESTORE_KEY_SERVICES=1  grants WRITE_SECURE_SETTINGS, so that with restore_key_services (config.xml or a
 #                         theme) Home puts these helpers back after a force stop of the launcher
+#   PRAYER_OVERLAY=1      allows the overlay app-op (SYSTEM_ALERT_WINDOW), so that with prayer_times (config.xml or
+#                         a theme) the prayer notice shows over any app; the alarm is set on the next return to Home
 # TCL firmware (TclAppBoot) refuses to bind an app's accessibility service while the app is not running unless it
 # holds the AUTO_START app-op, so grant it first; other TVs do not know the op and ignore it. Builds name it
 # AUTO_START (G08, AU02) or APP_AUTO_START (G10), so set both. App-ops reach the disk lazily: without
@@ -202,5 +204,8 @@ if [ "${INPUT_KEY_SERVICE:-0}" = 1 ]; then enable_service InputKeyService; fi
 if [ "${HOME_KEY_SERVICE:-0}" = 1 ]; then enable_service HomeKeyService; fi
 if [ "${RESTORE_KEY_SERVICES:-0}" = 1 ]; then
   "$PY" -I ../tools/tv.py "pm grant com.gathin.tvhome android.permission.WRITE_SECURE_SETTINGS && echo restore-granted"
+fi
+if [ "${PRAYER_OVERLAY:-0}" = 1 ]; then
+  "$PY" -I ../tools/tv.py "appops set com.gathin.tvhome SYSTEM_ALERT_WINDOW allow && appops write-settings 2>/dev/null; echo prayer-overlay-allowed"
 fi
 echo "Installed. Press Home on the remote to see it."

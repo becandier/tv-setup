@@ -309,6 +309,29 @@
                 android:focusable="false"
                 android:visibility="gone" />
 
+            <!-- prayer_times: the next prayer and how long until it (PrayerNotice.line), under the stats line or,
+                 with that gone, under the clock. Set with the clock once a minute; gone while the switch is off. -->
+            <TextView
+                android:id="@+id/prayer"
+                android:layout_width="wrap_content"
+                android:layout_below="@id/stats"
+                android:layout_alignStart="@id/leftBlock"
+                android:layout_alignEnd="@id/leftBlock"
+                android:gravity="right"
+                android:textDirection="rtl"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="6dp"
+                android:layout_marginTop="4dp"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:textColor="#D9FFFFFF"
+                android:textSize="15sp"
+                android:fontFamily="@string/font_medium"
+                android:letterSpacing="0.04"
+                android:focusable="false"
+                android:importantForAccessibility="no"
+                android:visibility="gone" />
+
             <LinearLayout
                 android:id="@+id/topButtons"
                 android:layout_width="wrap_content"

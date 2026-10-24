@@ -180,6 +180,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
     private boolean pillsShown;
     private TextView shamsiDate;
     private TextView stats;
+    /** prayer_times: the line under the clock, and the table it reads; the table is null while the switch is off. */
+    private TextView prayerLine;
+    private PrayerTimes prayerTimes;
     private List<RaceWeekend.Race> raceCalendar;
     private View racePanel;
     private TextView raceKicker, raceHeadline, raceSessions;
@@ -332,6 +335,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         @Override
         public void onReceive(Context context, Intent intent) {
             updateClockVisibility();
+            updatePrayer();
         }
     };
     private final Runnable minuteTick = new Runnable() {
@@ -437,6 +441,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         btnWifi = findViewById(R.id.btnWifi);
         shamsiDate = findViewById(R.id.shamsiDate);
         stats = findViewById(R.id.stats);
+        prayerLine = findViewById(R.id.prayer);
+        // The receivers and the alarm follow the switch; with it off they stay disabled and nothing is read.
+        PrayerNotice.apply(this, cfg.prayerTimes);
+        if (cfg.prayerTimes) prayerTimes = PrayerNotice.table(this);
         raceCalendar = cfg.raceCalendar;
         racePanel = findViewById(R.id.racePanel);
         raceKicker = findViewById(R.id.raceKicker);
@@ -842,6 +850,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         if (openLiveTvAfterBoot()) return;
         updateGreeting();
         updateRace();
+        updatePrayer();
+        // Also catches a grant of the overlay app-op since the last alarm, and a clock changed while Home was away.
+        if (prayerTimes != null) PrayerNotice.schedule(this);
         // The network and Inputs pills keep their state while Home is in the background, and callbacks update them
         // when the network or the inputs change, so this refresh only catches anything missed. Its binder calls
         // (about 7 ms on a TCL C755, most of it WifiManager.getConnectionInfo) would hold up the first frame back
@@ -1030,6 +1041,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         ambient.animate().cancel();
         heroArt.animate().cancel();
         handler.removeCallbacks(minuteTick);
+        handler.removeCallbacks(prayerTick);
         stopStats();
         if (diya != null) diya.stop();
         cancelPendingFocusScroll();
@@ -2285,6 +2297,23 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             greeting.setTextColor(greetingColor);
         }
         if (shamsi) shamsiDate.setText(Shamsi.today(getResources()));
+    }
+
+    // ---- prayer times (prayer_times) ----------------------------------------------------------------
+
+    private final Runnable prayerTick = this::updatePrayer;
+
+    /**
+     * "Asr 14:29 · in 1 h 12 min" under the clock. Re-set on the minute, in step with the clock rather than with
+     * minuteTick, which counts a minute from onResume: the countdown and the switch to the next prayer would lag.
+     */
+    private void updatePrayer() {
+        if (prayerTimes == null) return;
+        handler.removeCallbacks(prayerTick);
+        long now = System.currentTimeMillis();
+        prayerLine.setText(PrayerNotice.line(getResources(), prayerTimes, java.time.Instant.ofEpochMilli(now)));
+        prayerLine.setVisibility(View.VISIBLE);
+        if (!stopped) handler.postDelayed(prayerTick, MINUTE_MS - now % MINUTE_MS + 50);
     }
 
     // ---- race-weekend panel (a theme's race_calendar) -----------------------------------------------

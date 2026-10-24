@@ -21,6 +21,11 @@
     <!-- YaOS (Yandex TV OS): HDMI, AV and the tuner all play in com.yandex.tv.live, whose activities require
          this permission (protection level normal, so it is granted at install). Ignored on other TVs. -->
     <uses-permission android:name="yandex.tv.permission.ACCESS_TV_SOURCE" />
+    <!-- prayer_times (PrayerNotice): the notice over other apps, granted by build-and-install with
+         PRAYER_OVERLAY=1 (appops); the exact alarm for each prayer; and the reschedule after boot. -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <!-- Android 11+ package visibility: lets the launcher list the TV apps it shows as tiles, and the
          apps that declare a module card (docs/specs/card.md). -->
@@ -187,6 +192,27 @@
             android:authorities="${applicationId}.theme"
             android:exported="true"
             android:permission="android.permission.WRITE_SECURE_SETTINGS" />
+
+        <!-- prayer_times: the alarm at each prayer, and boot or a clock or zone change, set the next alarm.
+             Disabled here and switched on by MainActivity only while prayer_times is on; see PrayerNotice.
+             Not exported: the system delivers these broadcasts to it anyway. -->
+        <receiver
+            android:name=".PrayerNotice"
+            android:exported="false"
+            android:enabled="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+            </intent-filter>
+        </receiver>
+        <!-- Shows the notice now, for a check over an app: adb shell am broadcast -n
+             com.gathin.tvhome/.PrayerNotice\$Shell. Only senders holding DUMP (the adb shell, the system). -->
+        <receiver
+            android:name=".PrayerNotice$Shell"
+            android:exported="true"
+            android:enabled="false"
+            android:permission="android.permission.DUMP" />
 
         <!-- The remote's Input button (KEYCODE_TV or KEYCODE_TV_INPUT) opens the input switcher, and input_key_keycodes and
          app_keys (config.xml or a theme) bring back other remote buttons; see InputKeyService. -->

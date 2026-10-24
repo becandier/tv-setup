@@ -145,4 +145,15 @@
     <!-- Cinematic top shelf (cinematic_home): the line under the focused dock app's name; %1$s is when it was
          last opened, e.g. "5 minutes ago" or "yesterday, 9:40 pm". -->
     <string name="last_opened">Last opened %1$s</string>
+    <!-- prayer_times (config.xml, see PrayerTimes): the line under the clock and the notice over apps. -->
+    <string name="prayer_fajr">Fajr</string>
+    <string name="prayer_dhuhr">Dhuhr</string>
+    <string name="prayer_asr">Asr</string>
+    <string name="prayer_maghrib">Maghrib</string>
+    <string name="prayer_isha">Isha</string>
+    <string name="prayer_line">%1$s %2$s · in %3$s</string>
+    <string name="prayer_in_minutes">%1$d min</string>
+    <string name="prayer_in_hours">%1$d h %2$d min</string>
+    <string name="prayer_in_hours_whole">%1$d h</string>
+    <string name="prayer_notice">Prayer time: %1$s %2$s</string>
 </resources>

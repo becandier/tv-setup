@@ -311,6 +311,13 @@
          "show_stats": true. Nothing is read, and the clock does not move, while this is false. -->
     <bool name="show_stats">false</bool>
 
+    <!-- Prayer times for Makhachkala, from the Dagestan muftiate's table (assets/prayer_makhachkala.json, see
+         PrayerTimes), on Moscow time whatever the TV's zone: a line under the clock with the next prayer and how
+         long until it, and at each prayer a small notice in the corner over any app for a minute (PrayerNotice).
+         The notice needs the overlay app-op (PRAYER_OVERLAY=1 build-and-install.sh) and is skipped without it.
+         Off upstream; on in the namaz branch. A theme can set "prayer_times". -->
+    <bool name="prayer_times">true</bool>
+
     <!-- Time-of-day backdrop behind everything: a dark gradient that follows the clock, with a warm
          horizon glow around sunrise and sunset. 0 keeps the plain background (the default); 1 to 100
          sets its opacity. Around 60 reads clearly without hiding a wallpaper. Can also be set with
