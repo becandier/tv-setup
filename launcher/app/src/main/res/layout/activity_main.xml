@@ -1,19 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FF000000">
 
-    <!-- Time-of-day backdrop, drawn once a minute (config.xml sky_intensity; 0 keeps it hidden). -->
+                    <!-- Time-of-day backdrop, drawn once a minute (config.xml sky_intensity; 0 keeps it hidden). -->
     <com.gathin.tvhome.SkyView
         android:id="@+id/sky"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:importantForAccessibility="no" />
 
-    <!-- Cinematic top shelf (cinematic_home): the focused dock app's artwork, a few pixels across and
+                    <!-- Cinematic top shelf (cinematic_home): the focused dock app's artwork, a few pixels across and
          stretched over the screen, which softens it like a blur without the cost of one. Hidden otherwise. -->
     <ImageView
         android:id="@+id/heroArt"
@@ -24,14 +23,14 @@
         android:visibility="gone"
         android:importantForAccessibility="no" />
 
-    <!-- Ambient glow in the colour of the focused dock app. -->
+                    <!-- Ambient glow in the colour of the focused dock app. -->
     <View
         android:id="@+id/ambient"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:alpha="0" />
 
-    <!-- Race-weekend panel (a theme's race_calendar, see RaceWeekend): in the free space under the clock,
+                    <!-- Race-weekend panel (a theme's race_calendar, see RaceWeekend): in the free space under the clock,
          shown only from shortly before a weekend's first session until the race is over. Updated once a
          minute with the clock, never animated. -->
     <LinearLayout
@@ -95,7 +94,7 @@
             android:letterSpacing="0.12" />
     </LinearLayout>
 
-    <!-- Cinematic top shelf: darkens the edge behind the shelf and the lower half, so the text and the
+                    <!-- Cinematic top shelf: darkens the edge behind the shelf and the lower half, so the text and the
          dock stay readable over the artwork. -->
     <View
         android:id="@+id/heroScrim"
@@ -104,7 +103,7 @@
         android:visibility="gone"
         android:importantForAccessibility="no" />
 
-    <!-- Top shelf: the focused dock app's name, positioned above the dock in code. -->
+                    <!-- Top shelf: the focused dock app's name, positioned above the dock in code. -->
     <LinearLayout
         android:id="@+id/hero"
         android:layout_width="wrap_content"
@@ -337,83 +336,102 @@
                 android:importantForAccessibility="no"
                 android:visibility="gone" />
 
+            <!-- The pills as two right-aligned rows: the main ones (network, Settings) on top, the switches (VPN, Sleep)
+                 under them, each column one width (MainActivity.alignPillColumns). D-pad: Up and Down move between
+                 the rows, Left and Right within a row, Down from the lower row goes to the dock (pillKeys). -->
             <LinearLayout
                 android:id="@+id/topButtons"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toEndOf="@id/leftBlock"
                 android:layout_marginStart="16dp"
-                android:gravity="right"
                 android:layout_alignParentEnd="true"
-                android:layout_alignBottom="@id/leftBlock"
-                android:layout_marginBottom="6dp"
+                android:layout_alignParentTop="true"
                 android:clipChildren="false"
                 android:clipToPadding="false"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/btnInputs"
-                    style="@style/TopButton"
-                    android:text="@string/inputs"
-                    android:drawableStart="@drawable/ic_input"
-                    android:nextFocusDown="@+id/grid" />
+                <LinearLayout
+                    android:id="@+id/topRow1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
+                    android:orientation="horizontal">
 
-                <!-- The one pill that gives way when the row is short of room: its weight only shrinks it (the row
-                     is measured at most, never stretched), and the network name ellipsizes. -->
-                <TextView
-                    android:id="@+id/btnWifi"
-                    style="@style/TopButton"
-                    android:layout_weight="1"
-                    tools:ignore="InefficientWeight"
-                    android:maxWidth="180dp"
-                    android:singleLine="true"
-                    android:ellipsize="end"
-                    android:text="@string/wifi"
-                    android:drawableStart="@drawable/ic_wifi"
-                    android:nextFocusDown="@+id/grid" />
+                    <TextView
+                        android:id="@+id/btnInputs"
+                        style="@style/TopButton"
+                        android:text="@string/inputs"
+                        android:drawableStart="@drawable/ic_input"
+                        android:nextFocusDown="@+id/grid" />
 
-                <!-- vpn_pill: the lock shows whether a VPN is up; OK switches it (MainActivity.toggleVpn). Gone without a VPN app. -->
-                <TextView
-                    android:id="@+id/btnVpn"
-                    style="@style/TopButton"
-                    android:singleLine="true"
-                    android:text="@string/vpn"
-                    android:contentDescription="@string/vpn_toggle_off"
-                    android:drawableStart="@drawable/ic_lock_open"
-                    android:visibility="gone"
-                    android:nextFocusDown="@+id/grid" />
+                    <TextView
+                        android:id="@+id/btnWifi"
+                        style="@style/TopButton"
+                        android:maxWidth="240dp"
+                        android:singleLine="true"
+                        android:ellipsize="end"
+                        android:text="@string/wifi"
+                        android:drawableStart="@drawable/ic_wifi"
+                        android:nextFocusDown="@+id/grid" />
 
-                <!-- sleep_timer: OK steps the timer (SleepTimer); gone while off. -->
-                <TextView
-                    android:id="@+id/btnSleep"
-                    style="@style/TopButton"
-                    android:singleLine="true"
-                    android:text="@string/sleep_timer"
-                    android:drawableStart="@drawable/ic_sleep"
-                    android:visibility="gone"
-                    android:nextFocusDown="@+id/grid" />
+                    <TextView
+                        android:id="@+id/btnReorder"
+                        style="@style/TopButtonIcon"
+                        android:contentDescription="@string/reorder"
+                        android:drawableStart="@drawable/ic_swap_vert"
+                        android:nextFocusDown="@+id/grid" />
 
-                <TextView
-                    android:id="@+id/btnReorder"
-                    style="@style/TopButtonIcon"
-                    android:contentDescription="@string/reorder"
-                    android:drawableStart="@drawable/ic_swap_vert"
-                    android:nextFocusDown="@+id/grid" />
+                    <TextView
+                        android:id="@+id/btnLibraryTop"
+                        style="@style/TopButtonIcon"
+                        android:visibility="gone"
+                        android:contentDescription="@string/app_library"
+                        android:drawableStart="@drawable/ic_apps"
+                        android:nextFocusDown="@+id/grid" />
 
-                <TextView
-                    android:id="@+id/btnLibraryTop"
-                    style="@style/TopButtonIcon"
-                    android:visibility="gone"
-                    android:contentDescription="@string/app_library"
-                    android:drawableStart="@drawable/ic_apps"
-                    android:nextFocusDown="@+id/grid" />
+                    <TextView
+                        android:id="@+id/btnSettings"
+                        style="@style/TopButton"
+                        android:text="@string/settings"
+                        android:drawableStart="@drawable/ic_settings"
+                        android:nextFocusDown="@+id/grid" />
+                </LinearLayout>
 
-                <TextView
-                    android:id="@+id/btnSettings"
-                    style="@style/TopButton"
-                    android:text="@string/settings"
-                    android:drawableStart="@drawable/ic_settings"
-                    android:nextFocusDown="@+id/grid" />
+                <LinearLayout
+                    android:id="@+id/topRow2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:layout_marginTop="10dp"
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
+                    android:orientation="horizontal"
+                    android:visibility="gone">
+
+                    <!-- vpn_pill: the lock shows whether a VPN is up; OK switches it (MainActivity.toggleVpn). Gone without a VPN app. -->
+                    <TextView
+                        android:id="@+id/btnVpn"
+                        style="@style/TopButton"
+                        android:singleLine="true"
+                        android:text="@string/vpn"
+                        android:contentDescription="@string/vpn_toggle_off"
+                        android:drawableStart="@drawable/ic_lock_open"
+                        android:visibility="gone"
+                        android:nextFocusDown="@+id/grid" />
+
+                    <!-- sleep_timer: OK steps the timer (SleepTimer); gone while off. -->
+                    <TextView
+                        android:id="@+id/btnSleep"
+                        style="@style/TopButton"
+                        android:singleLine="true"
+                        android:text="@string/sleep_timer"
+                        android:drawableStart="@drawable/ic_sleep"
+                        android:visibility="gone"
+                        android:nextFocusDown="@+id/grid" />
+                </LinearLayout>
             </LinearLayout>
         </RelativeLayout>
 
@@ -440,7 +458,7 @@
         </FrameLayout>
     </LinearLayout>
 
-    <!-- The single floating glass highlight that springs between tiles. -->
+                    <!-- The single floating glass highlight that springs between tiles. -->
     <com.gathin.tvhome.GlassView
         android:id="@+id/glass"
         android:layout_width="10dp"

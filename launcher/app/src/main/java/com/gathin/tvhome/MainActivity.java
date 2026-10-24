@@ -455,6 +455,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             });
         }
         btnWifi = findViewById(R.id.btnWifi);
+        topRow1 = findViewById(R.id.topRow1);
+        topRow2 = findViewById(R.id.topRow2);
         shamsiDate = findViewById(R.id.shamsiDate);
         stats = findViewById(R.id.stats);
         prayerLine = findViewById(R.id.prayer);
@@ -686,22 +688,32 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             return true;
         });
 
-        // Keep focus on the top bar at its ends and at the top: Android's focus finder would otherwise
-        // jump to a tile far below when there is nothing in that direction.
-        boolean rtlMenuBar = getResources().getBoolean(R.bool.rtl_menu_bar);
+        // The pills sit in two rows (topRow1: network, Settings; topRow2: VPN, Sleep). Up and Down move between the
+        // rows to the pill nearest above or below, Left and Right stay within a row and stop at its ends, Down from the
+        // lower row (or from the upper one when nothing is under it) goes back to the dock tile Up came from. Up from
+        // the upper row goes nowhere: Android's focus finder would otherwise jump to a tile far below.
         View.OnKeyListener pillKeys = (v, keyCode, event) -> {
             if (event.getAction() != KeyEvent.ACTION_DOWN) return false;
-            if (keyCode == KeyEvent.KEYCODE_DPAD_UP) return true;
-            if (keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
-                // Back to the dock tile Up came from, not wherever the focus finder lands.
-                focusTile(lastFocused % COLUMNS);
-                return true;
+            boolean lower = v.getParent() == topRow2;
+            View target;
+            switch (keyCode) {
+                case KeyEvent.KEYCODE_DPAD_UP:
+                    target = lower ? nearestPill(topRow1, v) : null;
+                    if (target != null) target.requestFocus();
+                    return true;
+                case KeyEvent.KEYCODE_DPAD_DOWN:
+                    target = lower ? null : nearestPill(topRow2, v);
+                    if (target != null) target.requestFocus();
+                    else focusTile(lastFocused % COLUMNS);
+                    return true;
+                case KeyEvent.KEYCODE_DPAD_LEFT:
+                case KeyEvent.KEYCODE_DPAD_RIGHT:
+                    target = nextPillInRow(v, keyCode == KeyEvent.KEYCODE_DPAD_RIGHT);
+                    if (target != null) target.requestFocus();
+                    return true;
+                default:
+                    return false;
             }
-            int firstButton = btnInputs.getVisibility() == View.VISIBLE ? R.id.btnInputs : firstTopButton().getId();
-            int leftButton = rtlMenuBar ? R.id.btnSettings : firstButton;
-            int rightButton = rtlMenuBar ? firstButton : R.id.btnSettings;
-            if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT) return v.getId() == leftButton;
-            return keyCode == KeyEvent.KEYCODE_DPAD_RIGHT && v.getId() == rightButton;
         };
         btnInputs.setOnKeyListener(pillKeys);
         btnWifi.setOnKeyListener(pillKeys);
@@ -2174,6 +2186,77 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         hideHero();
     }
 
+    private LinearLayout topRow1, topRow2;
+
+    /** The shown pill of {@code row} whose middle is nearest {@code from}'s, or null when the row shows none. */
+    private static View nearestPill(LinearLayout row, View from) {
+        if (row.getVisibility() != View.VISIBLE) return null;
+        int[] at = new int[2];
+        from.getLocationOnScreen(at);
+        float mid = at[0] + from.getWidth() / 2f;
+        View best = null;
+        float bestDistance = Float.MAX_VALUE;
+        for (int i = 0; i < row.getChildCount(); i++) {
+            View c = row.getChildAt(i);
+            if (c.getVisibility() != View.VISIBLE || !c.isFocusable()) continue;
+            c.getLocationOnScreen(at);
+            float d = Math.abs(at[0] + c.getWidth() / 2f - mid);
+            if (d < bestDistance) {
+                bestDistance = d;
+                best = c;
+            }
+        }
+        return best;
+    }
+
+    /** The next shown pill to the right (or left) of {@code from} in its own row, or null at the row's end. */
+    private static View nextPillInRow(View from, boolean right) {
+        if (!(from.getParent() instanceof ViewGroup)) return null;
+        ViewGroup row = (ViewGroup) from.getParent();
+        int i = row.indexOfChild(from);
+        // The launcher lays out left to right (no supportsRtl), so the child order is the order on screen.
+        for (int k = right ? i + 1 : i - 1; k >= 0 && k < row.getChildCount(); k += right ? 1 : -1) {
+            View c = row.getChildAt(k);
+            if (c.getVisibility() == View.VISIBLE && c.isFocusable()) return c;
+        }
+        return null;
+    }
+
+    /** Hides the lower row while it has no pill, so the upper one does not keep an empty line under it. */
+    private void updateTopRows() {
+        if (topRow2 == null) return;
+        boolean any = false;
+        for (int i = 0; i < topRow2.getChildCount(); i++) {
+            if (topRow2.getChildAt(i).getVisibility() == View.VISIBLE) any = true;
+        }
+        int want = any ? View.VISIBLE : View.GONE;
+        if (topRow2.getVisibility() != want) topRow2.setVisibility(want);
+        alignPillColumns();
+    }
+
+    /**
+     * Gives Settings and the Sleep pill under it one width, the wider of the two, so the rows' outer column lines up
+     * and, with both rows right-aligned, the inner one too (network over VPN). Measured from the text, so it settles
+     * at once and does not loop through layout.
+     */
+    private void alignPillColumns() {
+        TextView settings = findViewById(R.id.btnSettings);
+        TextView under = btnSleep != null && btnSleep.getVisibility() == View.VISIBLE ? btnSleep : null;
+        int width = under == null ? 0 : Math.max(naturalWidth(settings), naturalWidth(under));
+        for (TextView pill : new TextView[]{settings, findViewById(R.id.btnSleep)}) {
+            int want = pill == settings || pill == under ? width : 0;
+            if (pill.getMinWidth() != want) pill.setMinWidth(want);
+        }
+    }
+
+    /** The width a pill takes for its own text, icon and padding, within its maximum. */
+    private static int naturalWidth(TextView pill) {
+        int w = (int) Math.ceil(android.text.Layout.getDesiredWidth(pill.getText(), pill.getPaint()))
+                + pill.getCompoundPaddingLeft() + pill.getCompoundPaddingRight();
+        int max = pill.getMaxWidth();
+        return max > 0 ? Math.min(w, max) : w;
+    }
+
     /** The first top-bar button after Inputs that is shown: the network pill, Reorder, then Settings (always there). */
     private View firstTopButton() {
         if (btnWifi.getVisibility() == View.VISIBLE) return btnWifi;
@@ -2636,6 +2719,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         if (!cfg.sleepTimer) return;
         btnSleep = findViewById(R.id.btnSleep);
         btnSleep.setVisibility(View.VISIBLE);
+        updateTopRows();
         btnSleep.setOnClickListener(v -> SleepTimer.step(this));
         // Started, cancelled or run out anywhere (the countdown, adb): the pill follows at once.
         SleepTimer.changed = sleepChanged;
@@ -2646,7 +2730,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         if (btnSleep == null) return;
         long left = SleepPlan.minutesLeft(System.currentTimeMillis(), SleepTimer.end(this));
         CharSequence text = left > 0 ? getString(R.string.sleep_timer_left, left) : getString(R.string.sleep_timer);
-        if (!TextUtils.equals(btnSleep.getText(), text)) btnSleep.setText(text);
+        if (!TextUtils.equals(btnSleep.getText(), text)) {
+            btnSleep.setText(text);
+            alignPillColumns();
+        }
     }
 
     // ---- usage dock (usage_dock) -------------------------------------------------------------------
@@ -2766,6 +2853,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         if (btnVpn == null) return;
         boolean any = !vpnApps().isEmpty();
         btnVpn.setVisibility(any ? View.VISIBLE : View.GONE);
+        updateTopRows();
     }
 
     /**
