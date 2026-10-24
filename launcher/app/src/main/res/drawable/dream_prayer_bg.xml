@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- PrayerDream: Home's deep burgundy glow on black, drawn once (no animation). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <gradient
+        android:type="radial"
+        android:centerX="0.35"
+        android:centerY="0.6"
+        android:gradientRadius="100%p"
+        android:startColor="#FF4A0505"
+        android:centerColor="#FF220303"
+        android:endColor="#FF070101" />
+</shape>

@@ -11,6 +11,7 @@
 #        [-PrayerOverlay]     allows the overlay app-op for the prayer_times notice over other apps
 #        [-VpnPill]           allows the ACTIVATE_VPN app-op, so the vpn_pill switches off any app's VPN
 #        [-UsageDock]         allows the GET_USAGE_STATS app-op, so usage_dock fills the dock by two weeks of use
+#        [-PrayerDream]       makes the "Prayer" screensaver the TV's screensaver (prints the one it replaces)
 param(
     [string]$TvHost = $env:TV_HOST,
     [string]$StockLauncher = '',
@@ -19,7 +20,8 @@ param(
     [switch]$RestoreKeyServices,
     [switch]$PrayerOverlay,
     [switch]$VpnPill,
-    [switch]$UsageDock
+    [switch]$UsageDock,
+    [switch]$PrayerDream
 )
 $ErrorActionPreference = 'Stop'
 # Pipe plain UTF-8 to native commands; the default here prepends a BOM that corrupts the first command.
@@ -120,5 +122,8 @@ if ($VpnPill) {
 }
 if ($UsageDock) {
     'appops set com.gathin.tvhome GET_USAGE_STATS allow && appops write-settings 2>/dev/null; echo usage-dock-allowed' | & $py -I ..\tools\tv.py --batch
+}
+if ($PrayerDream) {
+    'echo screensaver was: $(settings get secure screensaver_components); settings put secure screensaver_components com.gathin.tvhome/.PrayerDream && settings put secure screensaver_enabled 1 && echo prayer-dream-set' | & $py -I ..\tools\tv.py --batch
 }
 Write-Host 'Installed. Press Home on the remote to see it.'

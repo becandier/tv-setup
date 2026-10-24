@@ -193,6 +193,19 @@
             </intent-filter>
         </service>
 
+        <!-- Screensaver "Prayer" (PrayerDream): the clock, dates and the next prayer. PRAYER_DREAM=1 build-and-install
+             makes it the screensaver. -->
+        <service
+            android:name=".PrayerDream"
+            android:label="@string/dream_prayer_name"
+            android:exported="true"
+            android:permission="android.permission.BIND_DREAM_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.dreams.DreamService" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
+
         <!-- tools/theme.sh writes the theme through this where the shell can't reach Android/data;
              see ThemeProvider. WRITE_SECURE_SETTINGS: the adb shell has it, ordinary apps don't. -->
         <provider

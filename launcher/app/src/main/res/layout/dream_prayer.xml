@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Screensaver "Prayer" (PrayerDream): clock, dates, the next prayer and the day's five times, drifting each
+     minute over Home's burgundy glow. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/dream_prayer_bg">
+
+    <LinearLayout
+        android:id="@+id/dreamContent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextClock
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:format12Hour="h:mm"
+            android:format24Hour="HH:mm"
+            android:textColor="#E6FFFFFF"
+            android:textSize="110sp"
+            android:fontFamily="@string/font_extralight"
+            android:letterSpacing="-0.04"
+            android:includeFontPadding="false" />
+
+        <TextClock
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:layout_marginTop="6dp"
+            android:format12Hour="@string/date_format"
+            android:format24Hour="@string/date_format"
+            android:textColor="#A6FFFFFF"
+            android:textSize="17sp"
+            android:fontFamily="@string/font_regular"
+            android:letterSpacing="0.14"
+            android:textAllCaps="true" />
+
+        <TextView
+            android:id="@+id/dreamHijri"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:layout_marginTop="4dp"
+            android:textColor="#80FFFFFF"
+            android:textSize="14sp"
+            android:fontFamily="@string/font_regular"
+            android:letterSpacing="0.14"
+            android:textAllCaps="true" />
+
+        <TextView
+            android:id="@+id/dreamPrayer"
+            android:layout_width="wrap_content"
+            android:layout_height="46dp"
+            android:layout_marginTop="22dp"
+            android:gravity="center_vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="20dp"
+            android:background="@drawable/prayer_pill_bg"
+            android:drawablePadding="10dp"
+            android:singleLine="true"
+            android:textColor="#DDFFFFFF"
+            android:textSize="17sp"
+            android:fontFamily="@string/font_medium"
+            android:letterSpacing="0.01" />
+
+        <TextView
+            android:id="@+id/dreamDay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:layout_marginTop="14dp"
+            android:singleLine="true"
+            android:textColor="#73FFFFFF"
+            android:textSize="13sp"
+            android:fontFamily="@string/font_regular"
+            android:letterSpacing="0.04" />
+    </LinearLayout>
+</FrameLayout>
