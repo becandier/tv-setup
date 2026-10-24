@@ -157,4 +157,18 @@
     <string name="prayer_notice">Время намаза: %1$s %2$s</string>
     <string name="vpn_toggle_on">VPN включён</string>
     <string name="vpn_toggle_off">VPN выключен</string>
+    <string-array name="hijri_months">
+        <item>мухаррам</item>
+        <item>сафар</item>
+        <item>раби аль-авваль</item>
+        <item>раби ас-сани</item>
+        <item>джумада аль-уля</item>
+        <item>джумада ас-сания</item>
+        <item>раджаб</item>
+        <item>шаабан</item>
+        <item>рамадан</item>
+        <item>шавваль</item>
+        <item>зуль-када</item>
+        <item>зуль-хиджа</item>
+    </string-array>
 </resources>

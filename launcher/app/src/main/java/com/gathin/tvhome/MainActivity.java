@@ -195,6 +195,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
     private TextView stats;
     /** prayer_times: the line under the clock, and the table it reads; the table is null while the switch is off. */
     private TextView prayerLine;
+    /** hijri_date: the Umm al-Qura line under the date; null while off. */
+    private TextView hijriDate;
     private PrayerTimes prayerTimes;
     private List<RaceWeekend.Race> raceCalendar;
     private View racePanel;
@@ -465,6 +467,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         raceSessions = findViewById(R.id.raceSessions);
         showStats = cfg.showStats;
         shamsi = cfg.shamsiDate;
+        if (cfg.hijriDate) {
+            hijriDate = findViewById(R.id.hijriDate);
+            hijriDate.setVisibility(View.VISIBLE);
+        }
         greetingName = cfg.greetingName;
         if (shamsi) {
             shamsiDate.setVisibility(View.VISIBLE);
@@ -2316,6 +2322,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             greeting.setTextColor(greetingColor);
         }
         if (shamsi) shamsiDate.setText(Shamsi.today(getResources()));
+        if (hijriDate != null) {
+            hijriDate.setText(Hijri.format(LocalDate.now(), getResources().getStringArray(R.array.hijri_months)));
+        }
     }
 
     // ---- prayer times (prayer_times) ----------------------------------------------------------------

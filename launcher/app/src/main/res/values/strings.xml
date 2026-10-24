@@ -159,4 +159,19 @@
     <!-- The VPN pill (config.xml vpn_pill): its spoken state; the pill itself reads "VPN". -->
     <string name="vpn_toggle_on">VPN on</string>
     <string name="vpn_toggle_off">VPN off</string>
+    <!-- hijri_date (Hijri): the Umm al-Qura months, Muharram first. -->
+    <string-array name="hijri_months">
+        <item>Muharram</item>
+        <item>Safar</item>
+        <item>Rabi al-Awwal</item>
+        <item>Rabi al-Thani</item>
+        <item>Jumada al-Ula</item>
+        <item>Jumada al-Akhirah</item>
+        <item>Rajab</item>
+        <item>Shaban</item>
+        <item>Ramadan</item>
+        <item>Shawwal</item>
+        <item>Dhu al-Qadah</item>
+        <item>Dhu al-Hijjah</item>
+    </string-array>
 </resources>

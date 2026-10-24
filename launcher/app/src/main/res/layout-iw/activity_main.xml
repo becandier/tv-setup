@@ -215,6 +215,22 @@
                         android:fontFamily="@string/font_regular"
                         android:letterSpacing="0.14"
                         android:textAllCaps="true" />
+
+                        <!-- hijri_date: the Umm al-Qura date (Hijri), set with the greeting; gone while off. -->
+                        <TextView
+                            android:id="@+id/hijriDate"
+                            android:gravity="right"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:singleLine="true"
+                            android:ellipsize="end"
+                            android:textColor="#80FFFFFF"
+                            android:textSize="12sp"
+                            android:fontFamily="@string/font_regular"
+                            android:letterSpacing="0.14"
+                            android:textAllCaps="true"
+                            android:visibility="gone" />
                 </LinearLayout>
 
                 <View

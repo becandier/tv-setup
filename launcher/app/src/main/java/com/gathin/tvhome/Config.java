@@ -150,6 +150,8 @@ final class Config {
     final String vpnTogglePackage;
     /** The dock from the apps watched most in the last two weeks (usage_dock); see UsageDock. */
     final boolean usageDock;
+    /** The Umm al-Qura date under the Gregorian one (hijri_date); see Hijri. */
+    final boolean hijriDate;
     /** Stock launcher whose home screen is sent back here if the firmware revives it (config.xml stock_home_redirect). */
     final String stockHomeRedirect;
     /** The Settings button opens the quick settings panel instead of the TV's Settings (settings_key_panel). */
@@ -228,7 +230,7 @@ final class Config {
                    boolean keyFilter, boolean dockGlass, String glowStyle, boolean wallpaperCaptions,
                    boolean handleViewInputs, boolean tileMenu, boolean dockEvenPadding, boolean cinematicDots, boolean cinematicWhiteFocus, boolean wifiStatusColor, int cinematicScrim, int cinematicArt,
                    Map<String, Set<String>> wallpaperMoods, boolean gamepadPassthrough, boolean prayerTimes,
-                   boolean vpnPill, String vpnTogglePackage, boolean usageDock) {
+                   boolean vpnPill, String vpnTogglePackage, boolean usageDock, boolean hijriDate) {
         this.handleViewInputs = handleViewInputs;
         this.tileMenu = tileMenu;
         this.inputKeycodes = inputKeycodes;
@@ -312,6 +314,7 @@ final class Config {
         this.vpnPill = vpnPill;
         this.vpnTogglePackage = vpnTogglePackage;
         this.usageDock = usageDock;
+        this.hijriDate = hijriDate;
         this.glowStyle = glowStyle(glowStyle);
         this.wallpaperCaptions = wallpaperCaptions;
     }
@@ -394,6 +397,7 @@ final class Config {
         boolean vpnPill = res.getBoolean(R.bool.vpn_pill);
         String vpnTogglePackage = res.getString(R.string.vpn_toggle_package).trim();
         boolean usageDock = res.getBoolean(R.bool.usage_dock);
+        boolean hijriDate = res.getBoolean(R.bool.hijri_date);
         boolean dockGlass = res.getBoolean(R.bool.dock_glass);
         boolean dockEvenPadding = res.getBoolean(R.bool.dock_even_padding);
         boolean cinematicDots = res.getBoolean(R.bool.cinematic_dots);
@@ -477,6 +481,7 @@ final class Config {
             vpnPill = bool(json, "vpn_pill", vpnPill);
             vpnTogglePackage = string(json, "vpn_toggle_package", vpnTogglePackage).trim();
             usageDock = bool(json, "usage_dock", usageDock);
+            hijriDate = bool(json, "hijri_date", hijriDate);
             dockGlass = bool(json, "dock_glass", dockGlass);
             dockEvenPadding = bool(json, "dock_even_padding", dockEvenPadding);
             cinematicDots = bool(json, "cinematic_dots", cinematicDots);
@@ -541,7 +546,7 @@ final class Config {
                 wallpapers, rotationMinutes, wallpaperDim, dockOpacity, wallpaperOrder, applied,
                 festival, inputKeycodes, appKeys, stockHomeRedirect, json == null ? Collections.emptyList() : raceCalendar(json), cinematic, ambientGlow, appGlow, fadeRows,
                 Math.max(0, idleClockMinutes), keyFilter, dockGlass, glowStyle, wallpaperCaptions, handleViewInputs, tileMenu, dockEvenPadding, cinematicDots, cinematicWhiteFocus, wifiStatusColor, cinematicScrim, cinematicArt, wallpaperMoods, gamepadPassthrough, prayerTimes,
-                vpnPill, vpnTogglePackage, usageDock);
+                vpnPill, vpnTogglePackage, usageDock, hijriDate);
     }
 
     /**

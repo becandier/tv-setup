@@ -193,6 +193,10 @@
          Gregorian date. -->
     <bool name="shamsi_date">false</bool>
 
+    <!-- The Islamic (Umm al-Qura) date as a third line under the Gregorian one, "13 Jumada al-Ula 1448" (Hijri).
+         Off upstream, on in the namaz branch. A theme can set "hijri_date". -->
+    <bool name="hijri_date">true</bool>
+
     <!-- A name after the greeting: "Mr. Trịnh" shows GOOD MORNING, MR. TRỊNH. Empty: the greeting alone. -->
     <string name="greeting_name" translatable="false"></string>
     <!-- Optional VPN app the network pill opens (hold the pill for Wi-Fi settings), e.g. the package of the

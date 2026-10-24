@@ -153,4 +153,18 @@
     <string name="prayer_notice">זמן תפילה: %1$s %2$s</string>
     <string name="vpn_toggle_on">ה־VPN פועל</string>
     <string name="vpn_toggle_off">ה־VPN כבוי</string>
+    <string-array name="hijri_months">
+        <item>מוחרם</item>
+        <item>צפר</item>
+        <item>רביע אל-אוול</item>
+        <item>רביע א-ת׳אני</item>
+        <item>ג׳ומאדא אל-אולא</item>
+        <item>ג׳ומאדא א-ת׳אניה</item>
+        <item>רג׳ב</item>
+        <item>שעבאן</item>
+        <item>רמדאן</item>
+        <item>שוואל</item>
+        <item>ד׳ו אל-קעדה</item>
+        <item>ד׳ו אל-חיג׳ה</item>
+    </string-array>
 </resources>
