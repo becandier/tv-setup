@@ -8,6 +8,7 @@
 #                             input_key_keycodes and app_keys; re-pass on every install
 #        [-HomeKeyService]    remotes whose Home button sends KEYCODE_ALL_APPS (Xiaomi sticks)
 #        [-RestoreKeyServices] grants WRITE_SECURE_SETTINGS for restore_key_services (helpers back after a force stop)
+#        $env:PRAYER_CITY = '<slug>' before running builds in that city's prayer table (prayer-tables/index.json)
 #        [-PrayerOverlay]     allows the overlay app-op for the prayer_times notice over other apps
 #        [-VpnPill]           allows the ACTIVATE_VPN app-op, so the vpn_pill switches off any app's VPN
 #        [-UsageDock]         allows the GET_USAGE_STATS app-op, so usage_dock fills the dock by two weeks of use

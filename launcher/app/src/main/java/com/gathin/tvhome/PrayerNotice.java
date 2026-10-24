@@ -26,11 +26,15 @@ import android.view.WindowManager;
 import android.widget.TextView;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.util.Properties;
 
 /**
  * prayer_times on Android: the table from assets, the line under the clock, and the notice over any app at each
@@ -43,12 +47,15 @@ public class PrayerNotice extends BroadcastReceiver {
 
     private static final String TAG = "PrayerNotice";
     private static final String ACTION_PRAYER = "com.gathin.tvhome.action.PRAYER";
-    private static final String ASSET = "prayer_makhachkala.json";
+    /** Put there by the build from PRAYER_CITY (launcher/app/build.gradle); absent when no city was chosen. */
+    private static final String ASSET_TABLE = "prayer/table.json", ASSET_CITY = "prayer/city.properties";
     /** An alarm delivered later than this after its prayer (the TV was in standby) shows nothing. */
     private static final Duration LATE = Duration.ofMinutes(5);
     private static final long SHOW_MS = 60_000L;
 
     private static PrayerTimes table;
+    /** The build carried no city, or its table did not read: no prayer line, no alarms, and no second try. */
+    private static boolean noTable;
     /** The notice on screen, built on the application context, so holding it leaks no activity. */
     @SuppressLint("StaticFieldLeak")
     private static View shown;
@@ -86,13 +93,20 @@ public class PrayerNotice extends BroadcastReceiver {
 
     /** The table, read once per process; null (and logged) if the asset is missing or broken. */
     static synchronized PrayerTimes table(Context context) {
-        if (table != null) return table;
-        try (InputStream in = context.getAssets().open(ASSET)) {
+        if (table != null || noTable) return table;
+        try (InputStream in = context.getAssets().open(ASSET_TABLE);
+             InputStream city = context.getAssets().open(ASSET_CITY)) {
+            Properties props = new Properties();
+            props.load(new InputStreamReader(city, StandardCharsets.UTF_8));
+            ZoneId zone = ZoneId.of(props.getProperty("tz", "").trim());
             ByteArrayOutputStream out = new ByteArrayOutputStream(64 * 1024);
             byte[] buf = new byte[16 * 1024];
             for (int n; (n = in.read(buf)) > 0; ) out.write(buf, 0, n);
-            table = PrayerTimes.parse(new String(out.toByteArray(), StandardCharsets.UTF_8));
-        } catch (IOException | IllegalArgumentException e) {
+            table = PrayerTimes.parse(new String(out.toByteArray(), StandardCharsets.UTF_8), zone);
+        } catch (FileNotFoundException e) {
+            noTable = true;   // built without PRAYER_CITY
+        } catch (IOException | RuntimeException e) {
+            noTable = true;
             Log.w(TAG, "prayer table unreadable", e);
         }
         return table;

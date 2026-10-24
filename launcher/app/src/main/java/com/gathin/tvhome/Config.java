@@ -143,7 +143,7 @@ final class Config {
     final boolean keyFilter;
     /** With keyFilter on, the key services stop filtering while a game controller is connected (gamepad_passthrough). */
     final boolean gamepadPassthrough;
-    /** Makhachkala prayer times: a line under the clock and a notice over any app at each prayer (prayer_times). */
+    /** Prayer times of the build's city (PRAYER_CITY): a line under the clock and a notice over any app at each prayer (prayer_times). */
     final boolean prayerTimes;
     /** The VPN pill next to the network pill (vpn_pill), and the VPN app it prefers (vpn_toggle_package, may be empty). */
     final boolean vpnPill;

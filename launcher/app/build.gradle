@@ -40,6 +40,61 @@ android {
     }
 }
 
+// prayer_times: the city's table goes into the APK's assets at build time, never fetched by the app. PRAYER_CITY (or
+// -PprayerCity) names a table in ../../prayer-tables (index.json gives its name and time zone), or is the path to a
+// table of that format with PRAYER_TZ set beside it. Unset: no table, and Home shows no prayer line.
+abstract class PrayerAssets extends DefaultTask {
+    @Input abstract Property<String> getCity()
+    @Input abstract Property<String> getZone()
+    @InputDirectory @PathSensitive(PathSensitivity.RELATIVE) abstract DirectoryProperty getTables()
+    @OutputDirectory abstract DirectoryProperty getOutputDir()
+
+    @TaskAction
+    void write() {
+        File out = outputDir.get().asFile
+        project.delete(out)
+        String city = this.city.get().trim()
+        if (city.isEmpty()) return
+        File dir = tables.get().asFile
+        File table
+        String name
+        String zone = this.zone.get().trim()
+        if (city.endsWith('.json')) {
+            table = new File(city)
+            name = table.name - '.json'
+            if (zone.isEmpty()) throw new GradleException("PRAYER_CITY is a file: set PRAYER_TZ too (e.g. Europe/Moscow)")
+        } else {
+            if (!(city ==~ /[a-z0-9-]+/)) throw new GradleException("PRAYER_CITY '$city': a slug from prayer-tables/index.json or a .json path")
+            def index = new groovy.json.JsonSlurper().parse(new File(dir, 'index.json'))
+            def entry = index[city]
+            if (entry == null) throw new GradleException("PRAYER_CITY '$city' is not in prayer-tables/index.json; run tools/prayer_table.py")
+            table = new File(dir, city + '.json')
+            name = entry.name
+            if (zone.isEmpty()) zone = entry.tz
+        }
+        if (!table.isFile()) throw new GradleException("no prayer table at $table")
+        File assets = new File(out, 'prayer')
+        assets.mkdirs()
+        java.nio.file.Files.copy(table.toPath(), new File(assets, 'table.json').toPath())
+        // Written by hand, not Properties.store: no date comment, so the same city builds the same APK.
+        def esc = { String v -> v.replace('\\', '\\\\').replace('=', '\\=').replace(':', '\\:') }
+        new File(assets, 'city.properties').setText("name=${esc(name)}\ntz=${esc(zone)}\n", 'UTF-8')
+    }
+}
+
+def prayerAssets = tasks.register('prayerAssets', PrayerAssets) {
+    city = providers.gradleProperty('prayerCity').orElse(providers.environmentVariable('PRAYER_CITY')).orElse('')
+    zone = providers.gradleProperty('prayerTz').orElse(providers.environmentVariable('PRAYER_TZ')).orElse('')
+    tables = rootProject.layout.projectDirectory.dir('../prayer-tables')
+    outputDir = layout.buildDirectory.dir('generated/prayer-assets')
+}
+
+androidComponents {
+    onVariants(selector().all()) { variant ->
+        variant.sources.assets.addGeneratedSourceDirectory(prayerAssets, { it.outputDir })
+    }
+}
+
 dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.3.2'
     implementation 'androidx.dynamicanimation:dynamicanimation:1.0.0'

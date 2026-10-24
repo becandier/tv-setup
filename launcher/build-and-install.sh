@@ -187,6 +187,8 @@ esac
 #                         sticks: the key is routed to the launcher (HomeKeyService)
 #   RESTORE_KEY_SERVICES=1  grants WRITE_SECURE_SETTINGS, so that with restore_key_services (config.xml or a
 #                         theme) Home puts these helpers back after a force stop of the launcher
+#   PRAYER_CITY=<slug>    builds in that city's prayer table (prayer-tables/index.json, or one made with
+#                         tools/prayer_table.py) for prayer_times; unset, the launcher shows no prayer times
 #   PRAYER_OVERLAY=1      allows the overlay app-op (SYSTEM_ALERT_WINDOW), so that with prayer_times (config.xml or
 #                         a theme) the prayer notice shows over any app; the alarm is set on the next return to Home
 #   VPN_PILL=1            allows the ACTIVATE_VPN app-op, so that with vpn_pill (config.xml or a theme) OK on the VPN

@@ -21,15 +21,18 @@ public class PrayerTimesTest {
     private static final Duration WINDOW = Duration.ofMinutes(5);
     private static PrayerTimes table;
 
-    // The real asset, so a broken copy of the muftiate's table fails here rather than on the TV.
+    private static final java.time.ZoneId MOSCOW = java.time.ZoneId.of("Europe/Moscow");
+
+    // The muftiate's table for Makhachkala as the build bundles it (prayer-tables/ at the repo root), so a broken
+    // table fails here rather than on the TV.
     @BeforeClass
     public static void load() throws IOException {
         table = PrayerTimes.parse(new String(Files.readAllBytes(
-                Paths.get("src/main/assets/prayer_makhachkala.json")), StandardCharsets.UTF_8));
+                Paths.get("../../prayer-tables/makhachkala.json")), StandardCharsets.UTF_8), MOSCOW);
     }
 
     private static Instant msk(String local) {
-        return ZonedDateTime.of(java.time.LocalDateTime.parse(local), PrayerTimes.ZONE).toInstant();
+        return ZonedDateTime.of(java.time.LocalDateTime.parse(local), MOSCOW).toInstant();
     }
 
     @Test
@@ -108,7 +111,7 @@ public class PrayerTimesTest {
 
     @Test
     public void theTvsOwnZoneDoesNotMatter() {
-        // 11:00 UTC is 14:00 in Makhachkala whatever zone the TV is set to.
+        // 11:00 UTC is 14:00 on the table's clock whatever zone the TV is set to.
         assertSame(PrayerTimes.Prayer.ASR, table.next(Instant.parse("2026-10-24T11:00:00Z")).prayer);
     }
 
@@ -131,7 +134,7 @@ public class PrayerTimesTest {
     @Test(expected = IllegalArgumentException.class)
     public void aShortTableIsRefused() {
         PrayerTimes.parse("[{\"fajr\": \"05:42\", \"sunrise\": \"07:19\", \"dhuhr\": \"11:58\", \"asr\": \"14:09\","
-                + " \"maghrib\": \"16:31\", \"isha\": \"17:51\"}]");
+                + " \"maghrib\": \"16:31\", \"isha\": \"17:51\"}]", MOSCOW);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -143,6 +146,6 @@ public class PrayerTimesTest {
             json.append("{\"fajr\": \"05:42\", \"dhuhr\": \"11:58\", \"asr\": \"").append(asr)
                     .append("\", \"maghrib\": \"16:31\", \"isha\": \"17:51\"}");
         }
-        PrayerTimes.parse(json.append(']').toString());
+        PrayerTimes.parse(json.append(']').toString(), MOSCOW);
     }
 }

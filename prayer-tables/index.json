@@ -1,0 +1,191 @@
+{
+  "agul": {
+    "name": "Агульский район (Тпиг)",
+    "lat": 41.7801,
+    "lon": 47.5924,
+    "tz": "Europe/Moscow",
+    "source": "muftiate-dagestan"
+  },
+  "akhty": {
+    "name": "Ахтынский район (Ахты)",
+    "lat": 41.4615,
+    "lon": 47.742,
+    "tz": "Europe/Moscow",
+    "source": "muftiate-dagestan"
+  },
+  "akhvakh": {
+    "name": "Ахвахский район (Карата)",
+    "lat": 42.5957,
+    "lon": 46.3395,
+    "tz": "Europe/Moscow",
+    "source": "muftiate-dagestan"
+  },
+  "babayurt": {
+    "name": "Бабаюртовский район (Бабаюрт)",
+    "lat": 43.6004,
+    "lon": 46.7775,
+    "tz": "Europe/Moscow",
+    "source": "muftiate-dagestan"
+  },
+  "botlikh": {
+    "name": "Ботлихский район (Ботлих)",
+    "lat": 42.6645,
+    "lon": 46.2185,
+    "tz": "Europe/Moscow",
+    "source": "muftiate-dagestan"
+  },
+  "buynaksk": {
+    "name": "Буйнакск",
+    "lat": 42.8261,
+    "lon": 47.122,
+    "tz": "Europe/Moscow",
+    "source": "muftiate-dagestan"
+  },
+  "dagestanskie-ogni": {
+    "name": "Дагестанские Огни",
+    "lat": 42.1152,
+    "lon": 48.1864,
+    "tz": "Europe/Moscow",
+    "source": "muftiate-dagestan"
+  },
+  "derbent": {
+    "name": "Дербент",
+    "lat": 42.0579,
+    "lon": 48.2888,
+    "tz": "Europe/Moscow",
+    "source": "muftiate-dagestan"
+  },
+  "gergebil": {
+    "name": "Гергебильский район (Гергебиль)",
+    "lat": 42.5022,
+    "lon": 47.0602,
+    "tz": "Europe/Moscow",
+    "source": "muftiate-dagestan"
+  },
+  "gumbet": {
+    "name": "Гумбетовский район (Мехельта)",
+    "lat": 42.7906,
+    "lon": 46.5031,
+    "tz": "Europe/Moscow",
+    "source": "muftiate-dagestan"
+  },
+  "izberbash": {
+    "name": "Избербаш",
+    "lat": 42.5647,
+    "lon": 47.8697,
+    "tz": "Europe/Moscow",
+    "source": "muftiate-dagestan"
+  },
+  "kaspiysk": {
+    "name": "Каспийск",
+    "lat": 42.8922,
+    "lon": 47.6372,
+    "tz": "Europe/Moscow",
+    "source": "muftiate-dagestan"
+  },
+  "kazbek": {
+    "name": "Казбековский район (Дылым)",
+    "lat": 43.0677,
+    "lon": 46.6348,
+    "tz": "Europe/Moscow",
+    "source": "muftiate-dagestan"
+  },
+  "khasavyurt": {
+    "name": "Хасавюрт",
+    "lat": 43.2469,
+    "lon": 46.5855,
+    "tz": "Europe/Moscow",
+    "source": "muftiate-dagestan"
+  },
+  "khunzakh": {
+    "name": "Хунзахский район (Хунзах)",
+    "lat": 42.5452,
+    "lon": 46.7071,
+    "tz": "Europe/Moscow",
+    "source": "muftiate-dagestan"
+  },
+  "kizilyurt": {
+    "name": "Кизилюрт",
+    "lat": 43.1999,
+    "lon": 46.8713,
+    "tz": "Europe/Moscow",
+    "source": "muftiate-dagestan"
+  },
+  "kizlyar": {
+    "name": "Кизляр",
+    "lat": 43.8547,
+    "lon": 46.7139,
+    "tz": "Europe/Moscow",
+    "source": "muftiate-dagestan"
+  },
+  "kurakh": {
+    "name": "Курахский район (Курах)",
+    "lat": 41.5841,
+    "lon": 47.7837,
+    "tz": "Europe/Moscow",
+    "source": "muftiate-dagestan"
+  },
+  "levashi": {
+    "name": "Левашинский район (Леваши)",
+    "lat": 42.4307,
+    "lon": 47.3233,
+    "tz": "Europe/Moscow",
+    "source": "muftiate-dagestan"
+  },
+  "makhachkala": {
+    "name": "Махачкала",
+    "lat": 42.983,
+    "lon": 47.5049,
+    "tz": "Europe/Moscow",
+    "source": "muftiate-dagestan"
+  },
+  "rutul": {
+    "name": "Рутульский район (Рутул)",
+    "lat": 41.5335,
+    "lon": 47.4245,
+    "tz": "Europe/Moscow",
+    "source": "muftiate-dagestan"
+  },
+  "shamil": {
+    "name": "Шамильский район (Хебда)",
+    "lat": 42.4442,
+    "lon": 46.551,
+    "tz": "Europe/Moscow",
+    "source": "muftiate-dagestan"
+  },
+  "shamilkala": {
+    "name": "Шамилькала",
+    "lat": 42.687,
+    "lon": 46.869,
+    "tz": "Europe/Moscow",
+    "source": "muftiate-dagestan"
+  },
+  "tlyarata": {
+    "name": "Тляратинский район (Тлярата)",
+    "lat": 42.1074,
+    "lon": 46.355,
+    "tz": "Europe/Moscow",
+    "source": "muftiate-dagestan"
+  },
+  "tsumada": {
+    "name": "Цумадинский район (Агвали)",
+    "lat": 42.5394,
+    "lon": 46.1222,
+    "tz": "Europe/Moscow",
+    "source": "muftiate-dagestan"
+  },
+  "untsukul": {
+    "name": "Унцукульский район (Унцукуль)",
+    "lat": 42.7127,
+    "lon": 46.7898,
+    "tz": "Europe/Moscow",
+    "source": "muftiate-dagestan"
+  },
+  "yuzhno-sukhokumsk": {
+    "name": "Южно-Сухокумск",
+    "lat": 44.6593,
+    "lon": 45.6502,
+    "tz": "Europe/Moscow",
+    "source": "muftiate-dagestan"
+  }
+}

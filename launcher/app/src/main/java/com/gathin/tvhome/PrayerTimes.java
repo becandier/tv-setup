@@ -11,15 +11,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Prayer times for Makhachkala (prayer_times), read from the Dagestan muftiate's official table in
- * assets/prayer_makhachkala.json: 365 rows of {fajr, sunrise, dhuhr, asr, maghrib, isha} as "HH:MM", local time.
- * Copied unchanged from the dua-bot project (content/prayer-tables/mahashkala.json, with its source fixes); the
- * times are taken as written, never computed. Plain Java, so the schedule is tested on the JVM.
+ * Prayer times for one city (prayer_times), read from its table: 365 rows of {fajr, sunrise, dhuhr, asr, maghrib,
+ * isha} as "HH:MM" on the city's wall clock. The build puts the table chosen with PRAYER_CITY into the assets
+ * (prayer-tables/ at the repo root: the Dagestan muftiate's 27 tables, or one from tools/prayer_table.py).
+ * The app takes the times as written and never computes them. Plain Java, so the schedule is tested on the JVM.
  */
 final class PrayerTimes {
 
-    /** The table's wall clock. Dagestan keeps Moscow time; the TV's own zone may be anything. */
-    static final ZoneId ZONE = ZoneId.of("Europe/Moscow");
+    /** The table's wall clock, the city's zone; the TV's own zone may be anything. */
+    final ZoneId zone;
     static final int DAYS = 365;
 
     /** The five daily prayers in table order. Sunrise is in the table but is not a prayer, so it is never "next". */
@@ -46,15 +46,16 @@ final class PrayerTimes {
     /** Minutes after midnight, [row][prayer]. */
     private final int[][] minutes;
 
-    private PrayerTimes(int[][] minutes) {
+    private PrayerTimes(int[][] minutes, ZoneId zone) {
         this.minutes = minutes;
+        this.zone = zone;
     }
 
     /**
      * Reads the table. A small scanner rather than org.json, which is only a stub on the JVM; the file is ours,
      * so anything unexpected (a row count other than 365, a missing field, a time out of order) is an error.
      */
-    static PrayerTimes parse(String json) {
+    static PrayerTimes parse(String json, ZoneId zone) {
         List<int[]> rows = new ArrayList<>();
         int[] row = null;
         String key = null;
@@ -90,7 +91,7 @@ final class PrayerTimes {
             }
         }
         if (rows.size() != DAYS) throw new IllegalArgumentException(rows.size() + " rows, expected " + DAYS);
-        return new PrayerTimes(rows.toArray(new int[0][]));
+        return new PrayerTimes(rows.toArray(new int[0][]), zone);
     }
 
     private static int clockMinutes(String hhmm) {
@@ -121,7 +122,7 @@ final class PrayerTimes {
         List<Time> out = new ArrayList<>(row.length);
         for (Prayer p : Prayer.values()) {
             int m = row[p.ordinal()];
-            out.add(new Time(p, ZonedDateTime.of(date, LocalTime.of(m / 60, m % 60), ZONE)));
+            out.add(new Time(p, ZonedDateTime.of(date, LocalTime.of(m / 60, m % 60), zone)));
         }
         return out;
     }
@@ -131,7 +132,7 @@ final class PrayerTimes {
      * the one after it. After isha it is tomorrow's fajr.
      */
     Time next(Instant now) {
-        LocalDate today = now.atZone(ZONE).toLocalDate();
+        LocalDate today = now.atZone(zone).toLocalDate();
         for (Time t : day(today)) {
             if (t.at.toInstant().isAfter(now)) return t;
         }
@@ -144,7 +145,7 @@ final class PrayerTimes {
      * nothing.
      */
     Time justStarted(Instant now, Duration window) {
-        LocalDate today = now.atZone(ZONE).toLocalDate();
+        LocalDate today = now.atZone(zone).toLocalDate();
         Time last = null;
         for (Time t : day(today)) {
             if (!t.at.toInstant().isAfter(now)) last = t;

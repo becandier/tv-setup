@@ -461,8 +461,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         stats = findViewById(R.id.stats);
         prayerLine = findViewById(R.id.prayer);
         // The receivers and the alarm follow the switch; with it off they stay disabled and nothing is read.
-        PrayerNotice.apply(this, cfg.prayerTimes);
+        // A build without PRAYER_CITY carries no table: then the switch stays off whatever config.xml says.
         if (cfg.prayerTimes) prayerTimes = PrayerNotice.table(this);
+        PrayerNotice.apply(this, prayerTimes != null);
         raceCalendar = cfg.raceCalendar;
         racePanel = findViewById(R.id.racePanel);
         raceKicker = findViewById(R.id.raceKicker);

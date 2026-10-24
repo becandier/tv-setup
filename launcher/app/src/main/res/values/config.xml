@@ -339,9 +339,10 @@
          "show_stats": true. Nothing is read, and the clock does not move, while this is false. -->
     <bool name="show_stats">false</bool>
 
-    <!-- Prayer times for Makhachkala, from the Dagestan muftiate's table (assets/prayer_makhachkala.json, see
-         PrayerTimes), on Moscow time whatever the TV's zone: a line under the clock with the next prayer and how
-         long until it, and at each prayer a small notice in the corner over any app for a minute (PrayerNotice).
+    <!-- Prayer times for the city the build was given (PRAYER_CITY=<slug from prayer-tables/index.json>
+         build-and-install.sh, see PrayerTimes), on that city's clock whatever the TV's zone: a line under the clock
+         with the next prayer and how long until it, and at each prayer a small notice in the corner over any app
+         for a minute (PrayerNotice). A build without PRAYER_CITY has no table, and none of this shows.
          The notice needs the overlay app-op (PRAYER_OVERLAY=1 build-and-install.sh) and is skipped without it.
          Off upstream; on in the namaz branch. A theme can set "prayer_times". -->
     <bool name="prayer_times">true</bool>
