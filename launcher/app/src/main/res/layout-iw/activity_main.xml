@@ -309,25 +309,29 @@
                 android:focusable="false"
                 android:visibility="gone" />
 
-            <!-- prayer_times: the next prayer and how long until it (PrayerNotice.line), under the stats line or,
-                 with that gone, under the clock. Set with the clock once a minute; gone while the switch is off. -->
+            <!-- prayer_times: the next prayer and how long until it (PrayerNotice.line) in a glass capsule like the top
+                 pills, but only to read, never focused: under the stats line or, with that gone, under the clock. Set
+                 with the clock once a minute; gone while the switch is off. -->
             <TextView
                 android:id="@+id/prayer"
                 android:layout_width="wrap_content"
+                android:layout_height="40dp"
                 android:layout_below="@id/stats"
-                android:layout_alignStart="@id/leftBlock"
                 android:layout_alignEnd="@id/leftBlock"
-                android:gravity="right"
-                android:textDirection="rtl"
-                android:layout_height="wrap_content"
                 android:layout_marginEnd="6dp"
-                android:layout_marginTop="4dp"
+                android:textDirection="rtl"
+                android:layout_marginTop="16dp"
+                android:gravity="center_vertical"
+                android:paddingStart="14dp"
+                android:paddingEnd="18dp"
+                android:background="@drawable/prayer_pill_bg"
+                android:drawablePadding="9dp"
                 android:singleLine="true"
                 android:ellipsize="end"
-                android:textColor="#D9FFFFFF"
+                android:textColor="#DDFFFFFF"
                 android:textSize="15sp"
                 android:fontFamily="@string/font_medium"
-                android:letterSpacing="0.04"
+                android:letterSpacing="0.01"
                 android:focusable="false"
                 android:importantForAccessibility="no"
                 android:visibility="gone" />

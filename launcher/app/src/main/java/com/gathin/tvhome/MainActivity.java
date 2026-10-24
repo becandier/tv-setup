@@ -2314,6 +2314,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
     // ---- prayer times (prayer_times) ----------------------------------------------------------------
 
     private final Runnable prayerTick = this::updatePrayer;
+    /** The prayer whose icon the capsule shows, so the drawable is only set when it changes. */
+    private PrayerTimes.Prayer prayerIcon;
 
     /**
      * "Asr 14:29 · in 1 h 12 min" under the clock. Re-set on the minute, in step with the clock rather than with
@@ -2323,7 +2325,13 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         if (prayerTimes == null) return;
         handler.removeCallbacks(prayerTick);
         long now = System.currentTimeMillis();
-        prayerLine.setText(PrayerNotice.line(getResources(), prayerTimes, java.time.Instant.ofEpochMilli(now)));
+        java.time.Instant at = java.time.Instant.ofEpochMilli(now);
+        PrayerTimes.Time next = prayerTimes.next(at);
+        prayerLine.setText(PrayerNotice.line(getResources(), next, at));
+        if (next.prayer != prayerIcon) {
+            prayerIcon = next.prayer;
+            prayerLine.setCompoundDrawablesRelativeWithIntrinsicBounds(PrayerNotice.icon(next.prayer), 0, 0, 0);
+        }
         prayerLine.setVisibility(View.VISIBLE);
         if (!stopped) handler.postDelayed(prayerTick, MINUTE_MS - now % MINUTE_MS + 50);
     }

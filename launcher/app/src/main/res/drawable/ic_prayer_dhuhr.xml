@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Dhuhr: the sun at its height. Line icon for prayer_times (the line under the clock and the notice); white, tinted by the view. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="22dp" android:height="22dp"
+    android:viewportWidth="24" android:viewportHeight="24">
+    <path
+        android:pathData="M7.8,12a4.2,4.2 0,1 0,8.4 0a4.2,4.2 0,1 0,-8.4 0"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M12,2.5v2.2M12,19.3v2.2M2.5,12h2.2M19.3,12h2.2M5.3,5.3l1.6,1.6M17.1,17.1l1.6,1.6M5.3,18.7l1.6,-1.6M17.1,6.9l1.6,-1.6"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>

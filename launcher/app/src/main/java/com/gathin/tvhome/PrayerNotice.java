@@ -10,11 +10,15 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.PixelFormat;
+import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -51,14 +55,20 @@ public class PrayerNotice extends BroadcastReceiver {
 
     /**
      * {@code adb shell am broadcast -n com.gathin.tvhome/.PrayerNotice\$Shell}: shows the notice for the nearest
-     * prayer now, to check how it looks over an app. Exported only to senders holding DUMP (the adb shell and the
-     * system; no installed app can get it), and disabled with the rest while prayer_times is off.
+     * prayer now, to check how it looks over an app; {@code --ei prayer 0..4} picks fajr..isha of that day instead.
+     * Exported only to senders holding DUMP (the adb shell and the system; no installed app can get it), and disabled
+     * with the rest while prayer_times is off.
      */
     public static final class Shell extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             PrayerTimes t = table(context);
-            if (t != null) show(context, t.next(Instant.now()));
+            if (t == null) return;
+            PrayerTimes.Time next = t.next(Instant.now());
+            // --ei prayer 0..4 (fajr..isha): that prayer of the same day instead, to check each icon.
+            int i = intent.getIntExtra("prayer", -1);
+            if (i >= 0 && i < PrayerTimes.Prayer.values().length) next = t.day(next.at.toLocalDate()).get(i);
+            show(context, next);
         }
     }
 
@@ -138,14 +148,33 @@ public class PrayerNotice extends BroadcastReceiver {
         }
     }
 
-    /** "Asr 14:29 · in 1 h 12 min", for the line under the clock. */
-    static String line(Resources res, PrayerTimes t, Instant now) {
-        PrayerTimes.Time next = t.next(now);
+    /** Each prayer's line icon, in the capsule under the clock and on the notice. */
+    static int icon(PrayerTimes.Prayer p) {
+        switch (p) {
+            case FAJR: return R.drawable.ic_prayer_fajr;
+            case DHUHR: return R.drawable.ic_prayer_dhuhr;
+            case ASR: return R.drawable.ic_prayer_asr;
+            case MAGHRIB: return R.drawable.ic_prayer_maghrib;
+            default: return R.drawable.ic_prayer_isha;
+        }
+    }
+
+    /** "Asr <b>14:29</b> · in <b>1 h 12 min</b>" for {@code next}, the line under the clock. */
+    static CharSequence line(Resources res, PrayerTimes.Time next, Instant now) {
         long minutes = PrayerTimes.minutesUntil(now, next.at.toInstant());
         String in = minutes < 60 ? res.getString(R.string.prayer_in_minutes, minutes)
                 : minutes % 60 == 0 ? res.getString(R.string.prayer_in_hours_whole, minutes / 60)
                 : res.getString(R.string.prayer_in_hours, minutes / 60, minutes % 60);
-        return res.getString(R.string.prayer_line, name(res, next.prayer), next.clock(), in);
+        String name = name(res, next.prayer), clock = next.clock();
+        SpannableString line = new SpannableString(res.getString(R.string.prayer_line, name, clock, in));
+        // Found in the formatted text, so a translation may order the parts its own way.
+        bold(line, line.toString().indexOf(clock), clock.length());
+        bold(line, line.toString().lastIndexOf(in), in.length());
+        return line;
+    }
+
+    private static void bold(SpannableString s, int start, int length) {
+        if (start >= 0) s.setSpan(new StyleSpan(Typeface.BOLD), start, start + length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
     }
 
     /**
@@ -165,6 +194,9 @@ public class PrayerNotice extends BroadcastReceiver {
         text.setTextColor(0xFFFFFFFF);
         text.setTextSize(16f);
         text.setSingleLine(true);
+        text.setGravity(Gravity.CENTER_VERTICAL);
+        text.setCompoundDrawablesRelativeWithIntrinsicBounds(icon(prayer.prayer), 0, 0, 0);
+        text.setCompoundDrawablePadding((int) (10 * dp));
         text.setPadding((int) (18 * dp), (int) (10 * dp), (int) (18 * dp), (int) (10 * dp));
         GradientDrawable bg = new GradientDrawable();
         bg.setColor(0xD9101418);
