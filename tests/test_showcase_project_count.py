@@ -20,7 +20,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SHOWCASE = ROOT / "SHOWCASE.md"
-README = ROOT / "README.md"
+README = ROOT / "README.upstream.md"
 
 # The page held 50+ rows when this test landed. A parser that silently matches nothing (a changed
 # row layout, a reordered page) must not read as "0 == 0, all good".

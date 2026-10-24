@@ -108,7 +108,7 @@ class CardScriptOutputTest(unittest.TestCase):
                                     "a reader who follows it writes a new file that nothing links")
 
     def test_the_card_script_writes_the_picture_the_front_page_shows(self):
-        readme = (ROOT / "README.md").read_text(encoding="utf-8")
+        readme = (ROOT / "README.upstream.md").read_text(encoding="utf-8")
         shown = set(re.findall(r'<img src="(docs/[^"]*card[^"]*)"', readme))
         self.assertTrue(shown, "README.md no longer displays a card image, so this check would prove nothing")
         named = set(DOCS_PICTURE.findall(docstring_of(TOOLS / "readme_card.py")))

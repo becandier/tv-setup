@@ -4,10 +4,17 @@ Instructions for coding agents (Claude Code, Codex, Gemini CLI, Cursor, Copilot 
 this repository. People should start with [README.md](README.md) and [CONTRIBUTING.md](CONTRIBUTING.md);
 this file repeats their rules in the form an agent needs, and links to them for the detail.
 
+This repository is the **tv-setup** fork of [Gathin23/cleanyourtv](https://github.com/Gathin23/cleanyourtv): the
+same tools and safety rules, plus prayer times, the Hijri date, a prayer screensaver, a sleep timer, a VPN pill, a
+usage-ordered dock and ByeByeDPI, set up by the skill in [`skills/tv-setup/SKILL.md`](skills/tv-setup/SKILL.md)
+(Russian). The upstream README is kept as [README.upstream.md](README.upstream.md); the README tables the tests
+check live there.
+
 ## First: which job are you doing?
 
 | You were asked to | Do this |
 |---|---|
+| Set up a TV "by the tv-setup skill" (настрой ТВ по скиллу tv-setup), or with prayer times, ByeByeDPI and the rest of this fork | Read [`skills/tv-setup/SKILL.md`](skills/tv-setup/SKILL.md) and follow it on the real TV. Ask the person only for their city and the apps they don't want. The rules in the next section still apply to every step. |
 | Clean up a TV: debloat it, install the launcher, push a theme | Read [PROMPT.md](PROMPT.md) and follow it exactly, on the real TV. Use the tools in `tools/` and the launcher in `launcher/` rather than writing new ones; the only file you need to change is `launcher/app/src/main/res/values/config.xml`, or a theme's `config.json`, for this TV. Do not edit the repo's docs, tests or other code, and do not open issues or pull requests unless the person asks you to. |
 | Change this repo: a TV list, a fix, a translation, a theme, docs | Skip the next section and read on from [Repo map](#repo-map). |
 
@@ -62,7 +69,10 @@ share their TV's list afterwards, follow [`docs/workflows/tv-list.md`](docs/work
 | Path | What it is |
 |---|---|
 | `PROMPT.md` | The prompt people paste into their agent. Brand-neutral; safety rules live here. |
-| `README.md` | Front page, with the TV table and the Tools table. `README.zh-CN.md` and `README.vi.md` are translations. |
+| `README.md` | This fork's front page, in Russian: what it adds, the one-line prompt, the manual commands and the restore. |
+| `README.upstream.md` | Upstream's front page at the fork point, with the TV table and the Tools table the tests check. |
+| `skills/tv-setup/` | The setup skill (Russian) and its references: connecting, which apps to offer, launcher flags, ByeByeDPI. Linked as `.claude/skills/tv-setup` for Claude Code. |
+| `prayer-tables/` | Prayer-time tables the launcher build can carry (`PRAYER_CITY`): the Dagestan muftiate's 27, plus any made with `tools/prayer_table.py`. `index.json` names them. |
 | `CONTRIBUTING.md` | The contributor guide for people. "Where does my idea go?" is the routing table. |
 | `SECURITY.md` | Private vulnerability reporting. |
 | `SHOWCASE.md` | Projects built on this repo that live in their own repositories. |
