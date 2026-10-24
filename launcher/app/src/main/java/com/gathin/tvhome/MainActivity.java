@@ -2389,7 +2389,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         root.invalidate();   // a resume that changes nothing on screen still draws once, so the refresh runs
     }
 
-    /** Shows the Wi-Fi network name on the button when we can read it, otherwise the connection type. */
+    /**
+     * Shows the Wi-Fi network name on the button when we can read it, otherwise the connection type; with no network
+     * at all, "Offline" and a crossed-out Wi-Fi icon. Android 8 and later hide the name unless location is on.
+     */
     private void updateWifiLabel() {
         String text = getString(R.string.wifi);
         boolean vpn = false, online = false;
@@ -2414,7 +2417,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
                 if (caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) wifi = true;
             }
             if (!online) {
+                // "No network" with the Wi-Fi icon crossed out; the next update with a network puts ic_wifi back.
                 text = getString(R.string.offline);
+                icon = R.drawable.ic_wifi_off;
                 vpn = false;
             } else if (ethernet) {
                 text = getString(R.string.ethernet);
