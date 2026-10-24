@@ -27,6 +27,13 @@
          set "fill_dock": false. -->
     <bool name="fill_dock">true</bool>
 
+    <!-- The dock from the apps watched most in the last 14 days, most first (UsageDock), instead of dock_apps. Only
+         tiles count, and never Settings or a VPN app; a short list is filled from dock_apps and the grid, so the dock
+         has no gap. The dock wins over a dock the owner arranged with Reorder; the rest of the grid keeps that order.
+         Needs the usage app-op (USAGE_DOCK=1 build-and-install.sh); without it the dock is dock_apps as before.
+         Read again on a return to Home at most every 10 minutes. A theme can set "usage_dock". -->
+    <bool name="usage_dock">true</bool>
+
     <!-- Apps never shown as tiles (e.g. the Live TV app, which the Inputs menu already covers). -->
     <string-array name="hidden_apps">
         <item>com.mediatek.wwtv.tvcenter</item>

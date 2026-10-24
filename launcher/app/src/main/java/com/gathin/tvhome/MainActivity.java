@@ -3,7 +3,10 @@ package com.gathin.tvhome;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.app.Activity;
+import android.app.AppOpsManager;
 import android.app.Dialog;
+import android.app.usage.UsageStats;
+import android.app.usage.UsageStatsManager;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -53,6 +56,7 @@ import android.text.Spanned;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -83,6 +87,7 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
@@ -468,6 +473,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             date.setPadding(0, (int) (4 * density), 0, 0);
         }
         vpnApp = cfg.vpnApp;
+        usageDock = cfg.usageDock;
         moduleCards = cfg.moduleCards;
         hiddenApps = new HashSet<>(cfg.hiddenApps);
 
@@ -876,6 +882,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         }
         if (showStats) startStats();
         updateVpnPillShown();
+        refreshUsageDock();
         sky.update();
         wallpaperPlayer.start();
         handler.postDelayed(minuteTick, MINUTE_MS);
@@ -2599,6 +2606,76 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         open(i != null ? i : systemIntent(Settings.ACTION_WIFI_SETTINGS));
     }
 
+
+    // ---- usage dock (usage_dock) -------------------------------------------------------------------
+
+    private static final long USAGE_REFRESH_MS = 10 * MINUTE_MS;
+    private boolean usageDock;
+    /** Uptime of the last usage read, or 0; and whether the usage app-op was allowed then. */
+    private long usageReadAt;
+    private boolean usageAllowed;
+    private boolean usageReading;
+
+    private boolean usageAllowed() {
+        AppOpsManager ops = getSystemService(AppOpsManager.class);
+        return ops != null && ops.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS, android.os.Process.myUid(),
+                getPackageName()) == AppOpsManager.MODE_ALLOWED;
+    }
+
+    /**
+     * On a return to Home: reads two weeks of usage off the main thread, at most every 10 minutes (sooner once the
+     * app-op is newly allowed), and rebuilds the tiles only when that gives a different dock, so focus and the
+     * entrance animation stay put otherwise. Without the app-op the dock stays dock_apps.
+     */
+    private void refreshUsageDock() {
+        if (!usageDock || usageReading) return;
+        boolean allowed = usageAllowed();
+        long now = SystemClock.uptimeMillis();
+        boolean fresh = usageReadAt != 0 && now - usageReadAt < USAGE_REFRESH_MS;
+        if (allowed == usageAllowed && (fresh || !allowed)) return;
+        usageAllowed = allowed;
+        usageReadAt = now;
+        if (!allowed) {
+            adapter.setUsage(null, Collections.emptySet());
+            reloadApps(false, true, false);
+            return;
+        }
+        Set<String> excluded = usageExcluded();
+        usageReading = true;
+        UsageStatsManager usm = getSystemService(UsageStatsManager.class);
+        new Thread(() -> {
+            Map<String, Long> usage = new HashMap<>();
+            long end = System.currentTimeMillis();
+            try {
+                Map<String, UsageStats> stats = usm == null ? null
+                        : usm.queryAndAggregateUsageStats(end - UsageDock.DAYS * 24L * 60 * MINUTE_MS, end);
+                if (stats != null) {
+                    for (Map.Entry<String, UsageStats> e : stats.entrySet()) {
+                        usage.put(e.getKey(), e.getValue().getTotalTimeInForeground());
+                    }
+                }
+            } catch (RuntimeException e) {
+                Log.w("TvHome", "usage_dock: no usage", e);
+            }
+            handler.post(() -> {
+                usageReading = false;
+                if (isDestroyed()) return;
+                boolean changed = adapter.usageChangesDock(usage, excluded);
+                adapter.setUsage(usage, excluded);
+                if (changed) reloadApps(false, true, false);
+            });
+        }, "usage-dock").start();
+    }
+
+    /** Never put in the dock for usage: the settings apps and every VPN app. */
+    private Set<String> usageExcluded() {
+        Set<String> out = new HashSet<>(Arrays.asList("com.android.tv.settings", "com.android.settings"));
+        for (ResolveInfo r : getPackageManager().queryIntentActivities(new Intent(Settings.ACTION_SETTINGS), 0)) {
+            if (r.activityInfo != null) out.add(r.activityInfo.packageName);
+        }
+        out.addAll(vpnApps());
+        return out;
+    }
 
     // ---- VPN pill (vpn_toggle_package) ------------------------------------------------------------
 

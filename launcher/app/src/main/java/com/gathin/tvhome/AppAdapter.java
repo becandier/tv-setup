@@ -209,6 +209,11 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     /** Tile names and bundled banners that replace the app's own (config.xml, app_labels and app_banners). */
     private final Map<String, String> appLabels, appBanners;
     private final List<Entry> items = new ArrayList<>();
+    /** usage_dock: foreground time per package and the packages never put in the dock for it; null while off. */
+    private Map<String, Long> usage;
+    private Set<String> usageExcluded = Collections.emptySet();
+    /** The tiles' packages in the usual order at the last reload(), and the dock usage gave them (or null). */
+    private List<String> usualOrder, dockOverride;
 
     AppAdapter(Context ctx, TileListener listener, int dockSize, Config cfg) {
         this.ctx = ctx;
@@ -307,6 +312,20 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             if (ca != cb) return ca ? -1 : 1;
             return a.label.compareToIgnoreCase(b.label);
         });
+        // usage_dock: the most watched apps take the dock, in that order; the grid after them keeps the order above.
+        usualOrder = new ArrayList<>();
+        for (Entry e : fresh) usualOrder.add(e.pkg);
+        dockOverride = usage == null ? null : UsageDock.pick(usualOrder, usage, usageExcluded, dockSize);
+        if (dockOverride != null) {
+            final List<String> dock = dockOverride;
+            Collections.sort(fresh, (a, b) -> {
+                int da = dock.indexOf(a.pkg), db = dock.indexOf(b.pkg);
+                if (da < 0 && db < 0) return 0;   // a stable sort keeps the order above
+                if (da < 0) return 1;
+                if (db < 0) return -1;
+                return Integer.compare(da, db);
+            });
+        }
         // Retain the optional Default-home tile until dependent tile-ordering work is merged.
         if (showHomeSettings
                 && pm.resolveActivity(new Intent(Settings.ACTION_HOME_SETTINGS), 0) != null) {
@@ -519,6 +538,21 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         return isLibraryAt(position) ? Long.MIN_VALUE : items.get(position).component.flattenToShortString().hashCode();
     }
 
+    /**
+     * usage_dock: from the next reload(), the dock is UsageDock.pick of this usage (foreground time per package),
+     * {@code excluded} left out; null puts dock_apps and the saved order back in charge of the dock.
+     */
+    void setUsage(Map<String, Long> usage, Set<String> excluded) {
+        this.usage = usage;
+        this.usageExcluded = excluded;
+    }
+
+    /** Whether this usage would give a different dock than the one on screen: only then is a rebuild worth it. */
+    boolean usageChangesDock(Map<String, Long> usage, Set<String> excluded) {
+        if (usualOrder == null) return true;
+        return !UsageDock.pick(usualOrder, usage, excluded, dockSize).equals(dockOverride);
+    }
+
     /** Uses this saved order and dock size from the next reload() (Order.ranks, Order.docked). */
     void setSavedOrder(Map<String, Integer> ranks, int docked) {
         savedRanks = ranks;
@@ -530,6 +564,7 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
      * the owner moved into the dock stays there (#499); else a dock_apps entry.
      */
     private boolean isDocked(Entry e) {
+        if (dockOverride != null) return dockOverride.contains(e.pkg);
         if (savedDocked < 0) return favourites.contains(e.pkg);
         Integer rank = savedRanks.get(e.component.flattenToShortString());
         return rank != null && rank < savedDocked;

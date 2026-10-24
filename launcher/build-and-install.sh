@@ -191,6 +191,8 @@ esac
 #                         a theme) the prayer notice shows over any app; the alarm is set on the next return to Home
 #   VPN_PILL=1            allows the ACTIVATE_VPN app-op, so that with vpn_pill (config.xml or a theme) OK on the VPN
 #                         pill switches off any app's VPN without a consent dialog (VpnOff)
+#   USAGE_DOCK=1          allows the GET_USAGE_STATS app-op, so that with usage_dock (config.xml or a theme) the dock
+#                         holds the apps watched most in the last 14 days (UsageDock)
 # TCL firmware (TclAppBoot) refuses to bind an app's accessibility service while the app is not running unless it
 # holds the AUTO_START app-op, so grant it first; other TVs do not know the op and ignore it. Builds name it
 # AUTO_START (G08, AU02) or APP_AUTO_START (G10), so set both. App-ops reach the disk lazily: without
@@ -212,5 +214,8 @@ if [ "${PRAYER_OVERLAY:-0}" = 1 ]; then
 fi
 if [ "${VPN_PILL:-0}" = 1 ]; then
   "$PY" -I ../tools/tv.py "appops set com.gathin.tvhome ACTIVATE_VPN allow && appops write-settings 2>/dev/null; echo vpn-pill-allowed"
+fi
+if [ "${USAGE_DOCK:-0}" = 1 ]; then
+  "$PY" -I ../tools/tv.py "appops set com.gathin.tvhome GET_USAGE_STATS allow && appops write-settings 2>/dev/null; echo usage-dock-allowed"
 fi
 echo "Installed. Press Home on the remote to see it."
