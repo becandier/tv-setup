@@ -18,6 +18,10 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.PowerManager;
 import android.provider.Settings;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.RelativeSizeSpan;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -45,15 +49,25 @@ public class SleepTimer extends BroadcastReceiver {
     @SuppressLint("StaticFieldLeak")
     private static TextView warning;
     private static final Handler handler = new Handler(Looper.getMainLooper());
+    /** Home's Sleep pill, told when a timer starts or ends (from the pill, the adb shortcut or the countdown). */
+    @SuppressLint("StaticFieldLeak")
+    static Runnable changed;
+
+    private static void notifyChanged() {
+        Runnable r = changed;
+        if (r != null) handler.post(r);
+    }
 
     /**
      * {@code adb shell am broadcast -n com.gathin.tvhome/.SleepTimer\$Shell --ei minutes 1}: starts a timer of that
-     * many minutes (1 shows the warning at once). Only senders holding DUMP (the adb shell, the system).
+     * many minutes (1 shows the warning at once; 0 cancels). Only senders holding DUMP (the adb shell, the system).
      */
     public static final class Shell extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            start(context, Math.max(1, intent.getIntExtra("minutes", 1)));
+            int minutes = intent.getIntExtra("minutes", 1);
+            if (minutes > 0) start(context, minutes);
+            else clear(context);
         }
     }
 
@@ -105,6 +119,7 @@ public class SleepTimer extends BroadcastReceiver {
         long end = System.currentTimeMillis() + minutes * 60_000L;
         prefs(context).edit().putLong(END, end).putInt(MINUTES, minutes).apply();
         hideWarning(context);
+        notifyChanged();
         AlarmManager am = context.getSystemService(AlarmManager.class);
         if (am == null) return;
         long at = Math.max(System.currentTimeMillis(), end - SleepPlan.WARN_MS);
@@ -122,6 +137,7 @@ public class SleepTimer extends BroadcastReceiver {
         AlarmManager am = context.getSystemService(AlarmManager.class);
         if (am != null) am.cancel(alarmIntent(context));
         hideWarning(context);
+        notifyChanged();
     }
 
     private static PendingIntent alarmIntent(Context context) {
@@ -167,7 +183,8 @@ public class SleepTimer extends BroadcastReceiver {
         };
         text.setTextColor(0xFFFFFFFF);
         text.setTextSize(16f);
-        text.setSingleLine(true);
+        text.setMaxLines(2);
+        text.setLineSpacing(2 * dp, 1f);
         text.setGravity(Gravity.CENTER_VERTICAL);
         text.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_sleep, 0, 0, 0);
         text.setCompoundDrawablePadding((int) (10 * dp));
@@ -187,6 +204,8 @@ public class SleepTimer extends BroadcastReceiver {
         lp.x = (int) (48 * dp);
         lp.y = (int) (32 * dp);
         lp.setTitle(TAG);
+        // Set before the window is added, so it is measured with its text.
+        text.setText(warningText(res, SleepPlan.secondsLeft(System.currentTimeMillis(), end)));
         try {
             wm.addView(text, lp);
         } catch (RuntimeException e) {
@@ -205,11 +224,22 @@ public class SleepTimer extends BroadcastReceiver {
                     finish(app, end);
                     return;
                 }
-                text.setText(res.getString(R.string.sleep_warning, left));
+                text.setText(warningText(res, left));
                 handler.postDelayed(this, 1000);
             }
         };
         count.run();
+    }
+
+    /** "Sleep in 54 s" and, smaller and dimmer under it, "Any button cancels". */
+    private static CharSequence warningText(Resources res, long seconds) {
+        String title = res.getString(R.string.sleep_warning, seconds);
+        String hint = res.getString(R.string.sleep_warning_hint);
+        SpannableString s = new SpannableString(title + "\n" + hint);
+        int start = title.length() + 1;
+        s.setSpan(new RelativeSizeSpan(0.8f), start, s.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        s.setSpan(new ForegroundColorSpan(0xB3FFFFFF), start, s.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        return s;
     }
 
     /** The end: still the same timer (not cancelled or replaced), so the TV goes to standby. */

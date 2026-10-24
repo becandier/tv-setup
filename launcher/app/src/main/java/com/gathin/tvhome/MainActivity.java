@@ -1129,6 +1129,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(packageReceiver);
+        if (SleepTimer.changed == sleepChanged) SleepTimer.changed = null;
         wallpaperPlayer.close();
         ConnectivityManager cm = getSystemService(ConnectivityManager.class);
         TvInputManager tim = (TvInputManager) getSystemService(TV_INPUT_SERVICE);
@@ -2628,16 +2629,16 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
 
     /** The Sleep pill; null while sleep_timer is off. */
     private TextView btnSleep;
+    private final Runnable sleepChanged = this::updateSleepPill;
 
     private void setUpSleepPill(Config cfg) {
         SleepTimer.apply(this, cfg.sleepTimer);
         if (!cfg.sleepTimer) return;
         btnSleep = findViewById(R.id.btnSleep);
         btnSleep.setVisibility(View.VISIBLE);
-        btnSleep.setOnClickListener(v -> {
-            SleepTimer.step(this);
-            updateSleepPill();
-        });
+        btnSleep.setOnClickListener(v -> SleepTimer.step(this));
+        // Started, cancelled or run out anywhere (the countdown, adb): the pill follows at once.
+        SleepTimer.changed = sleepChanged;
     }
 
     /** "Sleep", or "Sleep 28 min" while a timer runs; with the clock each minute and on every return to Home. */

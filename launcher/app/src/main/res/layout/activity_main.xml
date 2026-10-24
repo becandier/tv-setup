@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -163,13 +164,13 @@
             android:clipChildren="false"
             android:clipToPadding="false">
 
+            <!-- The clock and dates keep the room their text needs; the pills get the rest (topButtons below), so a
+                 longer pill ("Sleep 90 min") shortens the network pill instead of cutting off a date. -->
             <LinearLayout
                 android:id="@+id/leftBlock"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
-                android:layout_toStartOf="@+id/topButtons"
-                android:layout_marginEnd="16dp"
                 android:orientation="vertical">
 
                 <!-- The header texts use gravity left, not start: the launcher lays out left to right
@@ -179,6 +180,7 @@
                     android:id="@+id/greeting"
                     android:gravity="left"
                     android:layout_width="match_parent"
+                    android:maxWidth="420dp"
                     android:layout_height="wrap_content"
                     android:singleLine="true"
                     android:ellipsize="end"
@@ -339,6 +341,9 @@
                 android:id="@+id/topButtons"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/leftBlock"
+                android:layout_marginStart="16dp"
+                android:gravity="right"
                 android:layout_alignParentEnd="true"
                 android:layout_alignBottom="@id/leftBlock"
                 android:layout_marginBottom="6dp"
@@ -353,9 +358,13 @@
                     android:drawableStart="@drawable/ic_input"
                     android:nextFocusDown="@+id/grid" />
 
+                <!-- The one pill that gives way when the row is short of room: its weight only shrinks it (the row
+                     is measured at most, never stretched), and the network name ellipsizes. -->
                 <TextView
                     android:id="@+id/btnWifi"
                     style="@style/TopButton"
+                    android:layout_weight="1"
+                    tools:ignore="InefficientWeight"
                     android:maxWidth="180dp"
                     android:singleLine="true"
                     android:ellipsize="end"

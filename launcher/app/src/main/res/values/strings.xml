@@ -178,7 +178,8 @@
     <!-- sleep_timer (SleepTimer): the pill, the countdown over apps and its outcome. -->
     <string name="sleep_timer">Sleep</string>
     <string name="sleep_timer_left">Sleep %1$d min</string>
-    <string name="sleep_warning">Sleep in %1$d s · any button cancels</string>
+    <string name="sleep_warning">Sleep in %1$d s</string>
+    <string name="sleep_warning_hint">Any button cancels</string>
     <string name="sleep_cancelled">Sleep timer off</string>
     <string name="sleep_no_helper">Sleep timer: turn on the remote helper (HOME_KEY_SERVICE or INPUT_KEY_SERVICE)</string>
 </resources>

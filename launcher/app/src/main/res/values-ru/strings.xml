@@ -174,7 +174,8 @@
     </string-array>
     <string name="sleep_timer">Сон</string>
     <string name="sleep_timer_left">Сон %1$d мин</string>
-    <string name="sleep_warning">Выключение через %1$d с · любая кнопка — отмена</string>
+    <string name="sleep_warning">Выключение через %1$d с</string>
+    <string name="sleep_warning_hint">Любая кнопка — отмена</string>
     <string name="sleep_cancelled">Таймер сна отменён</string>
     <string name="sleep_no_helper">Таймер сна: включите помощника пульта (HOME_KEY_SERVICE или INPUT_KEY_SERVICE)</string>
 </resources>

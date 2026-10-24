@@ -170,7 +170,8 @@
     </string-array>
     <string name="sleep_timer">שינה</string>
     <string name="sleep_timer_left">שינה %1$d דק׳</string>
-    <string name="sleep_warning">כיבוי בעוד %1$d שנ׳ · כל כפתור מבטל</string>
+    <string name="sleep_warning">כיבוי בעוד %1$d שנ׳</string>
+    <string name="sleep_warning_hint">כל כפתור מבטל</string>
     <string name="sleep_cancelled">טיימר השינה בוטל</string>
     <string name="sleep_no_helper">טיימר שינה: יש להפעיל את מסייע השלט (HOME_KEY_SERVICE או INPUT_KEY_SERVICE)</string>
 </resources>
