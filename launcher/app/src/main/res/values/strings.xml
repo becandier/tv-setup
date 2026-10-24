@@ -156,8 +156,7 @@
     <string name="prayer_in_hours">%1$d h %2$d min</string>
     <string name="prayer_in_hours_whole">%1$d h</string>
     <string name="prayer_notice">Prayer time: %1$s %2$s</string>
-    <!-- The VPN pill (config.xml vpn_pill). -->
+    <!-- The VPN pill (config.xml vpn_pill): its spoken state; the pill itself reads "VPN". -->
     <string name="vpn_toggle_on">VPN on</string>
     <string name="vpn_toggle_off">VPN off</string>
-    <string name="vpn_toggle_busy">VPN…</string>
 </resources>

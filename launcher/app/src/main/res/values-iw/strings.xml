@@ -151,7 +151,6 @@
     <string name="prayer_in_hours">%1$d שע׳ %2$d דק׳</string>
     <string name="prayer_in_hours_whole">%1$d שע׳</string>
     <string name="prayer_notice">זמן תפילה: %1$s %2$s</string>
-    <string name="vpn_toggle_on">VPN פועל</string>
-    <string name="vpn_toggle_off">VPN כבוי</string>
-    <string name="vpn_toggle_busy">VPN…</string>
+    <string name="vpn_toggle_on">ה־VPN פועל</string>
+    <string name="vpn_toggle_off">ה־VPN כבוי</string>
 </resources>

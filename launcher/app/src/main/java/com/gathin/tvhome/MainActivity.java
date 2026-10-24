@@ -2691,22 +2691,29 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
     }
 
     private static final long VPN_BUSY_MS = 10_000L;
-    private static final int VPN_GREEN = 0xFF30D158;
-    private ColorStateList vpnOnTint, vpnOffTint;
+    private static final int VPN_GREEN = 0xFF30D158, VPN_GREEN_ON_WHITE = 0xFF1E9E45;
+    private ColorStateList vpnOnTint, vpnOffTint, vpnBusyTint;
 
-    /** "VPN on" with a green lock, "VPN off", or "VPN…" between OK and the answer. Called from updateWifiLabel. */
+    /** A green closed lock while a VPN is up, an open one otherwise, faded between OK and the answer. From updateWifiLabel. */
     private void updateVpnPill(boolean up) {
         if (vpnShown != null && vpnShown != up) vpnBusyUntil = 0;   // the switch went through
-        vpnShown = up;
         boolean busy = SystemClock.uptimeMillis() < vpnBusyUntil;
-        CharSequence text = getString(busy ? R.string.vpn_toggle_busy : up ? R.string.vpn_toggle_on : R.string.vpn_toggle_off);
-        if (!TextUtils.equals(btnVpn.getText(), text)) btnVpn.setText(text);
-        // Green while up, except on the focused (white) pill, where the usual dark icon stays readable.
-        if (vpnOnTint == null) {
-            vpnOnTint = new ColorStateList(new int[][]{{android.R.attr.state_focused}, {}}, new int[]{0xFF111111, VPN_GREEN});
-            vpnOffTint = btnVpn.getCompoundDrawableTintList();
+        // The text stays "VPN", so the pill keeps its width; the lock carries the state, the description says it.
+        if (vpnShown == null || vpnShown != up) {
+            btnVpn.setCompoundDrawablesRelativeWithIntrinsicBounds(up ? R.drawable.ic_lock : R.drawable.ic_lock_open, 0, 0, 0);
+            btnVpn.setContentDescription(getString(up ? R.string.vpn_toggle_on : R.string.vpn_toggle_off));
         }
-        ColorStateList tint = up && !busy ? vpnOnTint : vpnOffTint;
+        vpnShown = up;
+        if (vpnOnTint == null) {
+            vpnOffTint = btnVpn.getCompoundDrawableTintList();
+            // VpnBadge's green; a darker shade of it on the focused (white) pill, where the light one washes out.
+            vpnOnTint = new ColorStateList(new int[][]{{android.R.attr.state_focused}, {}},
+                    new int[]{VPN_GREEN_ON_WHITE, VPN_GREEN});
+            // Between OK and the answer: the same icon at half strength.
+            vpnBusyTint = new ColorStateList(new int[][]{{android.R.attr.state_focused}, {}},
+                    new int[]{0x80111111, 0x80FFFFFF});
+        }
+        ColorStateList tint = busy ? vpnBusyTint : up ? vpnOnTint : vpnOffTint;
         if (btnVpn.getCompoundDrawableTintList() != tint) btnVpn.setCompoundDrawableTintList(tint);
     }
 

@@ -155,7 +155,6 @@
     <string name="prayer_in_hours">%1$d ч %2$d мин</string>
     <string name="prayer_in_hours_whole">%1$d ч</string>
     <string name="prayer_notice">Время намаза: %1$s %2$s</string>
-    <string name="vpn_toggle_on">VPN вкл</string>
-    <string name="vpn_toggle_off">VPN выкл</string>
-    <string name="vpn_toggle_busy">VPN…</string>
+    <string name="vpn_toggle_on">VPN включён</string>
+    <string name="vpn_toggle_off">VPN выключен</string>
 </resources>
