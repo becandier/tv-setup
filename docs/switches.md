@@ -34,3 +34,4 @@ the rules. Keys from before this rule are on its wanted list; a screenshot for o
 | `vpn_toggle_package` | <img src="switches/vpn_pill.jpg" width="320" alt="vpn_toggle_package on a TV"> |
 | `usage_dock` | <img src="switches/usage_dock.jpg" width="320" alt="usage_dock on a TV"> |
 | `hijri_date` | <img src="switches/hijri_date.jpg" width="320" alt="hijri_date on a TV"> |
+| `sleep_timer` | <img src="switches/sleep_timer.jpg" width="320" alt="sleep_timer on a TV"> |
