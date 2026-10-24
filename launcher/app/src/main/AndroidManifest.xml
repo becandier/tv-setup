@@ -246,6 +246,20 @@
             </intent-filter>
         </service>
 
+        <!-- sleep_timer: the alarm a minute before the end shows the countdown (SleepTimer). Disabled here and switched
+             on by MainActivity only while sleep_timer is on. -->
+        <receiver
+            android:name=".SleepTimer"
+            android:exported="false"
+            android:enabled="false" />
+        <!-- Starts a timer of n minutes from adb (am broadcast to .SleepTimer$Shell with the int extra "minutes").
+             Only senders holding DUMP (the adb shell, the system). -->
+        <receiver
+            android:name=".SleepTimer$Shell"
+            android:exported="true"
+            android:enabled="false"
+            android:permission="android.permission.DUMP" />
+
         <!-- The remote's Input button (KEYCODE_TV or KEYCODE_TV_INPUT) opens the input switcher, and input_key_keycodes and
          app_keys (config.xml or a theme) bring back other remote buttons; see InputKeyService. -->
         <service

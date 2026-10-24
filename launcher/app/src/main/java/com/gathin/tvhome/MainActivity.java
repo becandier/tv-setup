@@ -358,6 +358,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         public void run() {
             updateGreeting();
             updateRace();
+            updateSleepPill();
             // The pill follows the network callbacks and each return to Home; only the diya's flame follows the
             // signal level, so only it needs this minute's binder calls (about 7 ms on the UI thread).
             if (festive) updateWifiLabel();
@@ -626,6 +627,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             return true;
         });
         setUpVpnPill(cfg);
+        setUpSleepPill(cfg);
         launcherSettingsButton = cfg.launcherSettingsButton;
         if (launcherSettingsButton) {
             ((TextView) btnSettings).setText(R.string.launcher_settings);
@@ -704,11 +706,13 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         btnInputs.setOnKeyListener(pillKeys);
         btnWifi.setOnKeyListener(pillKeys);
         btnVpnView().setOnKeyListener(pillKeys);
+        findViewById(R.id.btnSleep).setOnKeyListener(pillKeys);
         btnSettings.setOnKeyListener(pillKeys);
         btnReorder.setOnKeyListener(pillKeys);
         btnLibraryTop.setOnKeyListener(pillKeys);
         if (advancedEffects) {
-            for (View button : new View[]{btnInputs, btnWifi, btnVpnView(), btnReorder, btnLibraryTop, btnSettings}) {
+            for (View button : new View[]{btnInputs, btnWifi, btnVpnView(), findViewById(R.id.btnSleep), btnReorder,
+                    btnLibraryTop, btnSettings}) {
                 button.setOnFocusChangeListener((view, focused) -> view.animate()
                         .scaleX(focused ? 1.04f : 1f).scaleY(focused ? 1.04f : 1f)
                         .setDuration(reducedMotion ? Motion.REDUCED_MS : 160).start());
@@ -888,6 +892,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         }
         if (showStats) startStats();
         updateVpnPillShown();
+        // The Home button never reaches the sleep countdown: coming Home is the press that cancels it.
+        SleepTimer.cancelByUser(this);
+        updateSleepPill();
         refreshUsageDock();
         sky.update();
         wallpaperPlayer.start();
@@ -2170,6 +2177,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
     private View firstTopButton() {
         if (btnWifi.getVisibility() == View.VISIBLE) return btnWifi;
         if (btnVpnView().getVisibility() == View.VISIBLE) return btnVpnView();
+        if (findViewById(R.id.btnSleep).getVisibility() == View.VISIBLE) return findViewById(R.id.btnSleep);
         if (btnReorder.getVisibility() == View.VISIBLE) return btnReorder;
         return findViewById(R.id.btnSettings);
     }
@@ -2615,6 +2623,30 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         open(i != null ? i : systemIntent(Settings.ACTION_WIFI_SETTINGS));
     }
 
+
+    // ---- sleep timer (sleep_timer) -----------------------------------------------------------------
+
+    /** The Sleep pill; null while sleep_timer is off. */
+    private TextView btnSleep;
+
+    private void setUpSleepPill(Config cfg) {
+        SleepTimer.apply(this, cfg.sleepTimer);
+        if (!cfg.sleepTimer) return;
+        btnSleep = findViewById(R.id.btnSleep);
+        btnSleep.setVisibility(View.VISIBLE);
+        btnSleep.setOnClickListener(v -> {
+            SleepTimer.step(this);
+            updateSleepPill();
+        });
+    }
+
+    /** "Sleep", or "Sleep 28 min" while a timer runs; with the clock each minute and on every return to Home. */
+    private void updateSleepPill() {
+        if (btnSleep == null) return;
+        long left = SleepPlan.minutesLeft(System.currentTimeMillis(), SleepTimer.end(this));
+        CharSequence text = left > 0 ? getString(R.string.sleep_timer_left, left) : getString(R.string.sleep_timer);
+        if (!TextUtils.equals(btnSleep.getText(), text)) btnSleep.setText(text);
+    }
 
     // ---- usage dock (usage_dock) -------------------------------------------------------------------
 

@@ -62,6 +62,7 @@ public class HomeKeyService extends AccessibilityService {
     @Override
     protected void onServiceConnected() {
         super.onServiceConnected();
+        SleepTimer.helper = this;   // sleep_timer puts the TV to sleep through this service
         settingsScancodes = getResources().getIntArray(R.array.settings_key_scancodes);
         // The service is directBootAware: Android 11 skips a service that is not while the user is still
         // locked at boot, writes accessibility_enabled=0 and, on TCL G03 firmware, never binds it after the
@@ -94,6 +95,7 @@ public class HomeKeyService extends AccessibilityService {
 
     @Override
     public void onDestroy() {
+        if (SleepTimer.helper == this) SleepTimer.helper = null;
         stopWaitingForUnlock();
         if (gamepads != null) gamepads.stop();
         super.onDestroy();
@@ -179,6 +181,7 @@ public class HomeKeyService extends AccessibilityService {
     /** Unbound by Android: the user turned the helper off, so Home doesn't put it back (ServiceRepair). */
     @Override
     public boolean onUnbind(Intent intent) {
+        if (SleepTimer.helper == this) SleepTimer.helper = null;
         if (repairRecord) ServiceRepair.disconnected(this, getClass());
         return super.onUnbind(intent);
     }

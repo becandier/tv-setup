@@ -85,6 +85,7 @@ A new key needs one there in the same pull request.
 | `vpn_toggle_package` | string | The VPN app `vpn_pill` prefers until another one is used from the pill. Empty: the first VPN app found |
 | `usage_dock` | bool | The dock holds the apps watched most in the last 14 days (never Settings or a VPN app), filled from `dock_apps` and the grid when fewer were used; it wins over a dock arranged with Reorder. Needs `USAGE_DOCK=1` at install, otherwise `dock_apps` as before. Off upstream, on in the `namaz` branch |
 | `hijri_date` | bool | The Islamic (Umm al-Qura) date as a third line under the Gregorian one, "13 Jumada al-Ula 1448". Off upstream, on in the `namaz` branch |
+| `sleep_timer` | bool | A Sleep pill in the top bar: OK steps off, 15, 30, 60, 90 minutes; a minute before the end a countdown over any app (any remote button cancels), then standby through the remote helper. Needs `SLEEP_TIMER=1` and `HOME_KEY_SERVICE=1` (or `INPUT_KEY_SERVICE=1`) at install. Off upstream, on in the `namaz` branch |
 | `handle_view_inputs` | bool | Answer the system input switcher (`VIEW_INPUTS`, what the remote's Input button becomes) with the Inputs menu, for sets whose stock launcher was its only handler (Hisense huangshan); `false` by default so a TV with its own input picker never gets a chooser |
 | `background_color` | `#RRGGBB` | Colour behind everything; black by default |
 | `sky_intensity` | 0 to 100 | Time-of-day backdrop: a dark gradient that follows the clock, 0 hides it (default) |

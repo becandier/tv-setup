@@ -374,6 +374,16 @@
                     android:visibility="gone"
                     android:nextFocusDown="@+id/grid" />
 
+                <!-- sleep_timer: OK steps the timer (SleepTimer); gone while off. -->
+                <TextView
+                    android:id="@+id/btnSleep"
+                    style="@style/TopButton"
+                    android:singleLine="true"
+                    android:text="@string/sleep_timer"
+                    android:drawableStart="@drawable/ic_sleep"
+                    android:visibility="gone"
+                    android:nextFocusDown="@+id/grid" />
+
                 <TextView
                     android:id="@+id/btnReorder"
                     style="@style/TopButtonIcon"

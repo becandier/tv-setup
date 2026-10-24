@@ -211,6 +211,13 @@
          an app VpnApps knows how to switch (Happ), or by opening it. Holding OK opens it. Shown only while some VPN
          app is installed. A theme can set "vpn_pill". -->
     <bool name="vpn_pill">true</bool>
+
+    <!-- A Sleep pill in the top bar: OK steps off, 15, 30, 60, 90 minutes, off; the pill shows the minutes left. A
+         minute before the end a countdown shows over any app (needs the overlay app-op, SLEEP_TIMER=1 or
+         PRAYER_OVERLAY=1 build-and-install), and any button on the remote cancels; at the end the TV goes to
+         standby through the remote helper (HOME_KEY_SERVICE=1 or INPUT_KEY_SERVICE=1, Android 9 or later). Off
+         upstream, on in the namaz branch. A theme can set "sleep_timer". -->
+    <bool name="sleep_timer">true</bool>
     <!-- The VPN app the pill prefers until another one has been used from it; empty: the first VPN app found. -->
     <string name="vpn_toggle_package" translatable="false">com.happproxy</string>
     <!-- The dock as its own row: a lighter band, no names under the tiles, parked low on the screen with the top
