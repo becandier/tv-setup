@@ -36,6 +36,7 @@ import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.NetworkRequest;
+import android.net.VpnService;
 import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
@@ -174,6 +175,13 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
     /** config show_inputs_pill: false keeps the Inputs pill hidden even when the TV has inputs. */
     private boolean showInputsPill = true;
     private TextView btnWifi;
+    /** The VPN pill (vpn_pill); null while the switch is off. */
+    private TextView btnVpn;
+    private String vpnTogglePackage;
+    /** The VPN state the pill last showed, null before the first update. */
+    private Boolean vpnShown;
+    /** After OK, "VPN…" until the state changes or this uptime passes. */
+    private long vpnBusyUntil;
     /** The network pill's icon as last set, so a refresh that changes nothing does not lay the top bar out again. */
     private int wifiIcon;
     /** The pills have been filled in once; later resumes refresh them after the first frame. */
@@ -605,6 +613,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             open(systemIntent(Settings.ACTION_WIFI_SETTINGS));
             return true;
         });
+        setUpVpnPill(cfg);
         launcherSettingsButton = cfg.launcherSettingsButton;
         if (launcherSettingsButton) {
             ((TextView) btnSettings).setText(R.string.launcher_settings);
@@ -682,11 +691,12 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         };
         btnInputs.setOnKeyListener(pillKeys);
         btnWifi.setOnKeyListener(pillKeys);
+        btnVpnView().setOnKeyListener(pillKeys);
         btnSettings.setOnKeyListener(pillKeys);
         btnReorder.setOnKeyListener(pillKeys);
         btnLibraryTop.setOnKeyListener(pillKeys);
         if (advancedEffects) {
-            for (View button : new View[]{btnInputs, btnWifi, btnReorder, btnLibraryTop, btnSettings}) {
+            for (View button : new View[]{btnInputs, btnWifi, btnVpnView(), btnReorder, btnLibraryTop, btnSettings}) {
                 button.setOnFocusChangeListener((view, focused) -> view.animate()
                         .scaleX(focused ? 1.04f : 1f).scaleY(focused ? 1.04f : 1f)
                         .setDuration(reducedMotion ? Motion.REDUCED_MS : 160).start());
@@ -865,6 +875,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             pillsShown = true;
         }
         if (showStats) startStats();
+        updateVpnPillShown();
         sky.update();
         wallpaperPlayer.start();
         handler.postDelayed(minuteTick, MINUTE_MS);
@@ -2145,6 +2156,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
     /** The first top-bar button after Inputs that is shown: the network pill, Reorder, then Settings (always there). */
     private View firstTopButton() {
         if (btnWifi.getVisibility() == View.VISIBLE) return btnWifi;
+        if (btnVpnView().getVisibility() == View.VISIBLE) return btnVpnView();
         if (btnReorder.getVisibility() == View.VISIBLE) return btnReorder;
         return findViewById(R.id.btnSettings);
     }
@@ -2438,8 +2450,14 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             }
         } catch (Exception ignored) {
         }
+        // The VPN pill shows the VPN on its own; the network pill then names only the network.
+        boolean vpnPillShown = btnVpn != null && btnVpn.getVisibility() == View.VISIBLE;
+        if (vpnPillShown) {
+            updateVpnPill(vpn);
+            vpn = false;
+        }
         // With a VPN app configured, a VPN that is down matters too: show a red "VPN off" capsule then.
-        boolean vpnDown = !vpn && online && !vpnApp.isEmpty();
+        boolean vpnDown = !vpn && online && !vpnApp.isEmpty() && !vpnPillShown;
         if (vpn || vpnDown) {
             // Network name, then the green lock-and-VPN (or red "VPN off") capsule drawn in place of the word.
             String badge = getString(vpn ? R.string.vpn : R.string.vpn_off);
@@ -2573,6 +2591,124 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         open(i != null ? i : systemIntent(Settings.ACTION_WIFI_SETTINGS));
     }
 
+
+    // ---- VPN pill (vpn_toggle_package) ------------------------------------------------------------
+
+    /** The pill's view whether or not it is in use, for the key and focus listeners every top pill gets. */
+    private View btnVpnView() {
+        return findViewById(R.id.btnVpn);
+    }
+
+    /**
+     * vpn_pill: shown while some VPN app is installed. OK switches the VPN off or on (toggleVpn); holding OK opens the
+     * VPN app. The state comes back through vpnCallback.
+     */
+    private void setUpVpnPill(Config cfg) {
+        if (!cfg.vpnPill) return;
+        vpnTogglePackage = cfg.vpnTogglePackage;
+        btnVpn = findViewById(R.id.btnVpn);
+        btnVpn.setOnClickListener(v -> toggleVpn());
+        btnVpn.setOnLongClickListener(v -> {
+            String pkg = vpnApp();
+            if (pkg != null) openVpnApp(pkg);
+            return true;
+        });
+        updateVpnPillShown();
+    }
+
+    /** The installed VPN apps, the launcher's own VpnOff left out. */
+    private Set<String> vpnApps() {
+        Set<String> out = new HashSet<>();
+        for (ResolveInfo r : getPackageManager().queryIntentServices(new Intent(VpnService.SERVICE_INTERFACE), 0)) {
+            if (r.serviceInfo != null && !getPackageName().equals(r.serviceInfo.packageName)) out.add(r.serviceInfo.packageName);
+        }
+        return out;
+    }
+
+    private SharedPreferences vpnPrefs() {
+        return getSharedPreferences("vpn_pill", MODE_PRIVATE);
+    }
+
+    /** The app the pill acts on (VpnApps.pick), or null with no VPN app installed. */
+    private String vpnApp() {
+        return VpnApps.pick(vpnApps(), vpnPrefs().getString("last", null), vpnTogglePackage);
+    }
+
+    /** Hides the pill while no VPN app is installed; onCreate and every resume, so an install or removal shows. */
+    private void updateVpnPillShown() {
+        if (btnVpn == null) return;
+        boolean any = !vpnApps().isEmpty();
+        btnVpn.setVisibility(any ? View.VISIBLE : View.GONE);
+    }
+
+    /**
+     * On: VpnService.prepare makes the launcher the VPN owner without a dialog when it holds the ACTIVATE_VPN app-op
+     * (VPN_PILL=1 build-and-install), and Android disconnects the VPN of whichever app had it; the launcher never
+     * opens a tunnel itself. Without the app-op prepare asks for consent instead, and the pill opens the VPN app.
+     * Off: the last VPN app's adapter (VpnApps) switches it on; an app without one is opened to connect there.
+     */
+    private void toggleVpn() {
+        String pkg = vpnApp();
+        if (Boolean.TRUE.equals(vpnShown)) {
+            Intent consent;
+            try {
+                consent = VpnService.prepare(this);
+            } catch (RuntimeException e) {
+                consent = new Intent();
+            }
+            if (consent != null) {
+                if (pkg != null) openVpnApp(pkg);
+                return;
+            }
+        } else {
+            if (pkg == null) return;
+            VpnApps.Adapter adapter = VpnApps.adapter(pkg);
+            ComponentName target = adapter == null ? null : ComponentName.unflattenFromString(adapter.component);
+            if (target == null) {
+                openVpnApp(pkg);
+                return;
+            }
+            try {
+                sendBroadcast(new Intent(adapter.action).setComponent(target));
+            } catch (RuntimeException e) {
+                openVpnApp(pkg);
+                return;
+            }
+            vpnPrefs().edit().putString("last", pkg).apply();
+        }
+        vpnBusyUntil = SystemClock.uptimeMillis() + VPN_BUSY_MS;
+        updateWifiLabel();
+        // If nothing answers, fall back to the real state once the wait is over.
+        handler.postDelayed(this::updateWifiLabel, VPN_BUSY_MS + 50);
+    }
+
+    private void openVpnApp(String pkg) {
+        vpnPrefs().edit().putString("last", pkg).apply();
+        Intent i = getPackageManager().getLeanbackLaunchIntentForPackage(pkg);
+        if (i == null) i = getPackageManager().getLaunchIntentForPackage(pkg);
+        if (i != null) open(i);
+        else Toast.makeText(this, R.string.not_available, Toast.LENGTH_SHORT).show();
+    }
+
+    private static final long VPN_BUSY_MS = 10_000L;
+    private static final int VPN_GREEN = 0xFF30D158;
+    private ColorStateList vpnOnTint, vpnOffTint;
+
+    /** "VPN on" with a green lock, "VPN off", or "VPN…" between OK and the answer. Called from updateWifiLabel. */
+    private void updateVpnPill(boolean up) {
+        if (vpnShown != null && vpnShown != up) vpnBusyUntil = 0;   // the switch went through
+        vpnShown = up;
+        boolean busy = SystemClock.uptimeMillis() < vpnBusyUntil;
+        CharSequence text = getString(busy ? R.string.vpn_toggle_busy : up ? R.string.vpn_toggle_on : R.string.vpn_toggle_off);
+        if (!TextUtils.equals(btnVpn.getText(), text)) btnVpn.setText(text);
+        // Green while up, except on the focused (white) pill, where the usual dark icon stays readable.
+        if (vpnOnTint == null) {
+            vpnOnTint = new ColorStateList(new int[][]{{android.R.attr.state_focused}, {}}, new int[]{0xFF111111, VPN_GREEN});
+            vpnOffTint = btnVpn.getCompoundDrawableTintList();
+        }
+        ColorStateList tint = up && !busy ? vpnOnTint : vpnOffTint;
+        if (btnVpn.getCompoundDrawableTintList() != tint) btnVpn.setCompoundDrawableTintList(tint);
+    }
 
     /** Every settings entry shares the standard intent and the vendor fallback (SystemSettings). */
     private Intent systemIntent(String standardAction) {

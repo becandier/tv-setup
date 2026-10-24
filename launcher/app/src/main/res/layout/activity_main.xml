@@ -342,6 +342,16 @@
                     android:drawableStart="@drawable/ic_wifi"
                     android:nextFocusDown="@+id/grid" />
 
+                <!-- vpn_pill: whether a VPN is up; OK switches it (MainActivity.toggleVpn). Gone without a VPN app. -->
+                <TextView
+                    android:id="@+id/btnVpn"
+                    style="@style/TopButton"
+                    android:singleLine="true"
+                    android:text="@string/vpn_toggle_off"
+                    android:drawableStart="@drawable/ic_lock"
+                    android:visibility="gone"
+                    android:nextFocusDown="@+id/grid" />
+
                 <TextView
                     android:id="@+id/btnReorder"
                     style="@style/TopButtonIcon"

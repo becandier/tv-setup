@@ -145,6 +145,9 @@ final class Config {
     final boolean gamepadPassthrough;
     /** Makhachkala prayer times: a line under the clock and a notice over any app at each prayer (prayer_times). */
     final boolean prayerTimes;
+    /** The VPN pill next to the network pill (vpn_pill), and the VPN app it prefers (vpn_toggle_package, may be empty). */
+    final boolean vpnPill;
+    final String vpnTogglePackage;
     /** Stock launcher whose home screen is sent back here if the firmware revives it (config.xml stock_home_redirect). */
     final String stockHomeRedirect;
     /** The Settings button opens the quick settings panel instead of the TV's Settings (settings_key_panel). */
@@ -222,7 +225,8 @@ final class Config {
                    List<RaceWeekend.Race> raceCalendar, boolean cinematicHome, boolean ambientGlow, boolean appGlow, boolean fadeRows, int homeIdleClockMinutes,
                    boolean keyFilter, boolean dockGlass, String glowStyle, boolean wallpaperCaptions,
                    boolean handleViewInputs, boolean tileMenu, boolean dockEvenPadding, boolean cinematicDots, boolean cinematicWhiteFocus, boolean wifiStatusColor, int cinematicScrim, int cinematicArt,
-                   Map<String, Set<String>> wallpaperMoods, boolean gamepadPassthrough, boolean prayerTimes) {
+                   Map<String, Set<String>> wallpaperMoods, boolean gamepadPassthrough, boolean prayerTimes,
+                   boolean vpnPill, String vpnTogglePackage) {
         this.handleViewInputs = handleViewInputs;
         this.tileMenu = tileMenu;
         this.inputKeycodes = inputKeycodes;
@@ -303,6 +307,8 @@ final class Config {
         this.wallpaperMoods = wallpaperMoods;
         this.gamepadPassthrough = gamepadPassthrough;
         this.prayerTimes = prayerTimes;
+        this.vpnPill = vpnPill;
+        this.vpnTogglePackage = vpnTogglePackage;
         this.glowStyle = glowStyle(glowStyle);
         this.wallpaperCaptions = wallpaperCaptions;
     }
@@ -382,6 +388,8 @@ final class Config {
         boolean keyFilter = res.getBoolean(R.bool.key_filter);
         boolean gamepadPassthrough = res.getBoolean(R.bool.gamepad_passthrough);
         boolean prayerTimes = res.getBoolean(R.bool.prayer_times);
+        boolean vpnPill = res.getBoolean(R.bool.vpn_pill);
+        String vpnTogglePackage = res.getString(R.string.vpn_toggle_package).trim();
         boolean dockGlass = res.getBoolean(R.bool.dock_glass);
         boolean dockEvenPadding = res.getBoolean(R.bool.dock_even_padding);
         boolean cinematicDots = res.getBoolean(R.bool.cinematic_dots);
@@ -462,6 +470,8 @@ final class Config {
             keyFilter = bool(json, "key_filter", keyFilter);
             gamepadPassthrough = bool(json, "gamepad_passthrough", gamepadPassthrough);
             prayerTimes = bool(json, "prayer_times", prayerTimes);
+            vpnPill = bool(json, "vpn_pill", vpnPill);
+            vpnTogglePackage = string(json, "vpn_toggle_package", vpnTogglePackage).trim();
             dockGlass = bool(json, "dock_glass", dockGlass);
             dockEvenPadding = bool(json, "dock_even_padding", dockEvenPadding);
             cinematicDots = bool(json, "cinematic_dots", cinematicDots);
@@ -525,7 +535,8 @@ final class Config {
                 Math.max(0, Math.min(100, skyIntensity)), settingsKeycodes, settingsKeyPanel, restoreKeyServices, wallpaperEnabled, wallpaper,
                 wallpapers, rotationMinutes, wallpaperDim, dockOpacity, wallpaperOrder, applied,
                 festival, inputKeycodes, appKeys, stockHomeRedirect, json == null ? Collections.emptyList() : raceCalendar(json), cinematic, ambientGlow, appGlow, fadeRows,
-                Math.max(0, idleClockMinutes), keyFilter, dockGlass, glowStyle, wallpaperCaptions, handleViewInputs, tileMenu, dockEvenPadding, cinematicDots, cinematicWhiteFocus, wifiStatusColor, cinematicScrim, cinematicArt, wallpaperMoods, gamepadPassthrough, prayerTimes);
+                Math.max(0, idleClockMinutes), keyFilter, dockGlass, glowStyle, wallpaperCaptions, handleViewInputs, tileMenu, dockEvenPadding, cinematicDots, cinematicWhiteFocus, wifiStatusColor, cinematicScrim, cinematicArt, wallpaperMoods, gamepadPassthrough, prayerTimes,
+                vpnPill, vpnTogglePackage);
     }
 
     /**

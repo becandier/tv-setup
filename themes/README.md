@@ -81,6 +81,8 @@ A new key needs one there in the same pull request.
 | `show_home_settings_shortcut` | bool | Keep the optional Default-home tile visible when the TV has a home picker; false by default |
 | `show_stats` | bool | One line under the clock with CPU, free memory and free storage. Off unless set |
 | `prayer_times` | bool | Makhachkala prayer times from the Dagestan muftiate's table: the next prayer under the clock, and a notice over any app at each prayer (needs `PRAYER_OVERLAY=1` at install). Off upstream, on in the `namaz` branch |
+| `vpn_pill` | bool | A VPN pill next to the network pill: shows whether any VPN is up, OK switches it off (any app, needs `VPN_PILL=1` at install) or on (the last VPN app: one press for apps the launcher knows, Happ, otherwise it opens the app), hold OK opens the app. Shown while a VPN app is installed. Off upstream, on in the `namaz` branch |
+| `vpn_toggle_package` | string | The VPN app `vpn_pill` prefers until another one is used from the pill. Empty: the first VPN app found |
 | `handle_view_inputs` | bool | Answer the system input switcher (`VIEW_INPUTS`, what the remote's Input button becomes) with the Inputs menu, for sets whose stock launcher was its only handler (Hisense huangshan); `false` by default so a TV with its own input picker never gets a chooser |
 | `background_color` | `#RRGGBB` | Colour behind everything; black by default |
 | `sky_intensity` | 0 to 100 | Time-of-day backdrop: a dark gradient that follows the clock, 0 hides it (default) |

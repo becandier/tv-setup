@@ -55,6 +55,10 @@
             <action android:name="android.intent.action.MAIN" />
             <category android:name="com.gathin.tvhome.category.DOCK_CARD" />
         </intent>
+        <!-- vpn_pill: the installed VPN apps (VpnApps). -->
+        <intent>
+            <action android:name="android.net.VpnService" />
+        </intent>
         <!-- stock_home_redirect: HomeKeyService looks up the stock launcher's HOME activity. -->
         <intent>
             <action android:name="android.intent.action.MAIN" />
@@ -213,6 +217,17 @@
             android:exported="true"
             android:enabled="false"
             android:permission="android.permission.DUMP" />
+
+        <!-- vpn_pill: never started; it makes the launcher a VPN app, so VpnService.prepare can take the VPN slot
+             and disconnect another app's VPN. See VpnOff. -->
+        <service
+            android:name=".VpnOff"
+            android:exported="false"
+            android:permission="android.permission.BIND_VPN_SERVICE">
+            <intent-filter>
+                <action android:name="android.net.VpnService" />
+            </intent-filter>
+        </service>
 
         <!-- The remote's Input button (KEYCODE_TV or KEYCODE_TV_INPUT) opens the input switcher, and input_key_keycodes and
          app_keys (config.xml or a theme) bring back other remote buttons; see InputKeyService. -->

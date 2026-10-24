@@ -30,3 +30,5 @@ the rules. Keys from before this rule are on its wanted list; a screenshot for o
 | `home_idle_clock_minutes` | <img src="clock-screensaver.png" width="320" alt="home_idle_clock_minutes on a TV"> |
 | `gamepad_passthrough` | <img src="switches/gamepad_passthrough.jpg" width="320" alt="gamepad_passthrough on a TV"> |
 | `prayer_times` | <img src="switches/prayer_times.jpg" width="320" alt="prayer_times on a TV"> |
+| `vpn_pill` | <img src="switches/vpn_pill.jpg" width="320" alt="vpn_pill on a TV"> |
+| `vpn_toggle_package` | <img src="switches/vpn_pill.jpg" width="320" alt="vpn_toggle_package on a TV"> |
