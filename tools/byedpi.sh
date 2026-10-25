@@ -106,11 +106,13 @@ EOF
 "$PY" -I tools/tv.py --push "$JSON" "$SETTINGS_ON_TV"
 rm -f "$JSON"
 
+# VPN consent without the system dialog: the same app-op the dialog's OK sets, granted over adb.
+tv "appops set $PKG ACTIVATE_VPN allow" >/dev/null
 CONSENT=$(tv "appops get $PKG ACTIVATE_VPN" | tr -d '\r')
 cat <<MSG
 Settings file on the TV: $SETTINGS_ON_TV
-Left to do with the remote (or by the agent with screenshots, skills/tv-setup/references/byedpi.md):
-  1. ByeByeDPI → Settings (gear) → menu → Import settings → $SETTINGS_ON_TV → tick all → OK.
-  2. Main screen → Connect. The first time Android asks to allow a VPN connection: OK on the remote.
-VPN consent now: ${CONSENT:-unknown}
+VPN consent: ${CONSENT:-unknown}
+Left for the agent (adb input + screenshots, skills/tv-setup/references/byedpi.md):
+  1. ByeByeDPI → Settings → menu → Import settings → $SETTINGS_ON_TV → tick all → OK.
+  2. Main screen → Connect.
 MSG
